@@ -75,9 +75,28 @@ services:
     networks:
       - chehoch-dev
 
+  survey:
+    build: apps/survey
+    restart: always
+    container_name: "survey-service"
+    command: python -m server.py
+    env_file:
+      - .env
+    volumes:
+      - apps/survey:/usr/src/app
+    ports:
+      - 8001:8001
+    networks:
+      - chehoch-dev
+    depends_on:
+      postgres_survey:
+        condition: service_healthy
+      redis:
+
 volumes:
   redis-data:
   postgres-data:
+  apps/survey:
 
 networks:
   chehoch-dev:
