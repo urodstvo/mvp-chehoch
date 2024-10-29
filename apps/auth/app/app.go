@@ -7,7 +7,7 @@ import (
 	"github.com/urodstvo/mvp-chehoch/apps/auth/internal/config"
 	"github.com/urodstvo/mvp-chehoch/apps/auth/internal/impl"
 	"github.com/urodstvo/mvp-chehoch/apps/auth/internal/logger"
-	"github.com/urodstvo/mvp-chehoch/apps/auth/proto"
+	proto "github.com/urodstvo/mvp-chehoch/libs/grpc/__generated__"
 
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.uber.org/fx"
