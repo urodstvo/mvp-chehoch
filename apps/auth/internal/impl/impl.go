@@ -1,6 +1,6 @@
 package impl
 
-import "github.com/urodstvo/mvp-chehoch/apps/auth/proto"
+import proto "github.com/urodstvo/mvp-chehoch/libs/grpc/__generated__"
 
 type Impl struct {
 	*proto.UnimplementedAuthServer
