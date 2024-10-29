@@ -4,6 +4,7 @@
   "description": "group project",
   "main": " ",
   "scripts": {
+    "init:project": "initialisation.bat",
     "dev": "npm run dev:survey",
     "dev:survey": "python ./apps/survey/server.py",
     "test": "echo \"Error: no test specified\" && exit 1",
