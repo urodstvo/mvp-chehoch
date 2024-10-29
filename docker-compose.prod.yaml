@@ -1,36 +1,40 @@
-version: "3.9"
-
 services:
   adminer_auth:
+    container_name: "adminer-auth"
     image: adminer
     restart: unless-stopped
     ports:
       - "8081:8080"
     environment:
-      - ADMINER_DEFAULT_SERVER=postgres:5432
+      - ADMINER_DEFAULT_SERVER=db-auth:5432
       - ADMINER_PLUGINS=enum-types enum-option json-column
     networks:
-      - chehoch-dev
+      - chehoch-prod
+    depends_on:
+      postgres_auth:
+        condition: service_healthy
 
   adminer_survey:
+    container_name: "adminer-survey"
     image: adminer
     restart: unless-stopped
     ports:
       - "8082:8080"
     environment:
-      - ADMINER_DEFAULT_SERVER=postgres:5433
+      - ADMINER_DEFAULT_SERVER=db-survey:5433
       - ADMINER_PLUGINS=enum-types enum-option json-column
     networks:
-      - chehoch-dev
+      - chehoch-prod
     depends_on:
       postgres_survey:
         condition: service_healthy
 
   postgres_auth:
+    container_name: "db-auth"
     image: postgres:14-alpine
     restart: unless-stopped
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - .postgres/auth:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     environment:
@@ -38,7 +42,7 @@ services:
       POSTGRES_PASSWORD: urodstvo
       POSTGRES_DB: urodstvo
     networks:
-      - chehoch-dev
+      - chehoch-prod
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U urodstvo"]
       interval: 2s
@@ -46,10 +50,11 @@ services:
       retries: 10
 
   postgres_survey:
+    container_name: "db-survey"
     image: postgres:14-alpine
     restart: unless-stopped
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - .postgres/survey:/var/lib/postgresql/data
     ports:
       - "5433:5432"
     environment:
@@ -57,7 +62,7 @@ services:
       POSTGRES_PASSWORD: urodstvo
       POSTGRES_DB: urodstvo
     networks:
-      - chehoch-dev
+      - chehoch-prod
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U urodstvo"]
       interval: 2s
@@ -65,6 +70,7 @@ services:
       retries: 10
 
   redis:
+    container_name: "redis"
     image: redis/redis-stack:latest
     restart: always
     ports:
@@ -73,7 +79,7 @@ services:
     volumes:
       - redis-data:/data
     networks:
-      - chehoch-dev
+      - chehoch-prod
 
   survey:
     build: apps/survey
@@ -87,7 +93,7 @@ services:
     ports:
       - 8001:8001
     networks:
-      - chehoch-dev
+      - chehoch-prod
     depends_on:
       postgres_survey:
         condition: service_healthy
@@ -99,5 +105,5 @@ volumes:
   apps/survey:
 
 networks:
-  chehoch-dev:
+  chehoch-prod:
     driver: bridge
