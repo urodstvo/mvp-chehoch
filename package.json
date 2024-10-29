@@ -7,8 +7,7 @@
     "init:project": "initialisation.bat",
     "dev": "npm run dev:survey",
     "dev:survey": "python ./apps/survey/server.py",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "proto:gen": "protoc -I ./libs/grpc --go_out=./apps/auth --go-grpc_out=./apps/auth ./libs/grpc/auth.proto"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
