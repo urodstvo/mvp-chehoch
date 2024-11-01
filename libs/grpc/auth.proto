@@ -5,6 +5,7 @@ package proto.auth;
 
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 service Auth {
     rpc Login (LoginRequest) returns (LoginResponse) {}
@@ -32,11 +33,31 @@ service Auth {
 }
 
 message User {
-    //TODO: add fields
+    int64 id = 1;
+    string login = 2;
+    string email = 3;
+    string first_name = 4;
+    string last_name = 5;
+    bool is_company = 6;
+    int64 organisation = 7;
+    google.protobuf.Timestamp t_created_at = 8; 
+    google.protobuf.Timestamp t_updated_at = 9; 
+    bool is_deleted = 10;
+
 }
 
 message Organization {
-    //TODO: add fields
+    int64 id = 1;
+    string name = 2;
+    int64 supervisor = 3;
+    string email = 4;
+    string phone = 5;
+    string adress = 6;
+    string web_site = 7;
+    string inn = 8;
+    google.protobuf.Timestamp t_created_at = 9; 
+    google.protobuf.Timestamp t_updated_at = 10; 
+    bool is_deleted = 11;
 }
 
 
@@ -52,6 +73,8 @@ message LoginResponse {
 message RegisterRequest {
     string login = 1;
     string password = 2;
+    string first_name = 3;
+    string last_name = 4;
 }
 
 message RegisterResponse {
@@ -104,7 +127,11 @@ message CheckAccessResponse {
 }
 
 message UpdateUserRequest {
-    // TODO: add fields
+    optional string login = 1;
+    optional string email = 2;
+    optional string first_name = 3;
+    optional string last_name = 4;
+    optional int64 organisation = 5;
 }
 
 message DeleteUserRequest {
@@ -132,11 +159,22 @@ message GetAllOrganizationsResponse {
 }
 
 message CreateOrganizationRequest {
-    // TODO: add fields
+    string name = 1;
+    string email = 2;
+    string phone = 3;
+    string adress = 4;
+    string inn = 5;
+    optional string web_site = 6;
 }
+    
 
 message UpdateOrganizationRequest {
-    // TODO: add fields
+    optional string name = 1;
+    optional string email = 2;
+    optional string phone = 3;
+    optional string adress = 4;
+    optional string inn = 5;
+    optional string web_site = 6;
 }
 
 message DeleteOrganizationRequest {
