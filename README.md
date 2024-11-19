@@ -16,6 +16,6 @@ npm run init:project
 
 ## group project at the university
 
-![SVG Image](./docs/architecture.svg)
+![Architecture](./docs/ЧЕХОЧ.png)
 
 <!-- prettier-ignore-end -->
