@@ -4,7 +4,7 @@ from config.logger import logger
 import grpc
 from concurrent import futures
 
-from proto import survey_pb2_grpc
+from libs.grpc.__generated__ import survey_pb2_grpc as survey_service
 from src.service import SurveyServicer
 
 from dotenv import load_dotenv
@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
 
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    survey_pb2_grpc.add_SurveyServicer_to_server(SurveyServicer(), server)
+    survey_service.add_SurveyServicer_to_server(SurveyServicer(), server)
     logger.info("Starting Survey Service GRPC in port ::8001")
     server.add_insecure_port("[::]:8001")
     server.start()
