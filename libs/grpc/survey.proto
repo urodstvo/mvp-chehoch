@@ -1,6 +1,33 @@
 syntax = "proto3";
 
 
-service Survey {
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
+
+service Survey {
+    rpc CreateSurvey (CreateSurveyRequest) returns (CreateSurveyResponse) {}
+    rpc UpdateSurvey (UpdateSurveyRequest) returns (UpdateSurveyResponse) {}
+    rpc DeleteSurvey (DeleteSurveyRequest) returns (DeleteSurveyResponse) {}
+    rpc GetSurveys (GetSurveysRequest) returns (GetSurveysResponse) {}
+    rpc GetSurvey (GetSurveyRequest) returns (GetSurveyResponse) {}
+    rpc GetOrganisationSurveys (GetOrganisationSurveysRequest) returns (GetOrganisationSurveysResponse) {}
+    rpc GetCompletedSurveys (GetCompletedSurveysRequest) returns (GetCompletedSurveysResponse) {}
+
+    rpc AddTagsToSurvey (AddTagsToSurveyRequest) returns (AddTagsToSurveyResponse) {}
+    rpc DeleteTagsFromSurvey (DeleteTagsFromSurveyRequest) returns (DeleteTagsFromSurveyResponse) {}
+
+    rpc CreateQuestion (CreateQuestionRequest) returns (CreateQuestionResponse) {}
+    rpc UpdateQuestion (UpdateQuestionRequest) returns (UpdateQuestionResponse) {}
+    rpc DeleteQuestion (DeleteQuestionRequest) returns (DeleteQuestionResponse) {}
+    rpc GetSurveyQuestions (GetSurveyQuestionsRequest) returns (GetSurveyQuestionsResponse) {}
+
+    rpc UpdateAnswer (UpdateAnswerRequest) returns (UpdateAnswerResponse) {}
+    rpc GetQuestionAnswers (GetSurveyAnswersRequest) returns (GetSurveyAnswersResponse) {}
+
+    rpc UpdateAnswerVariation (UpdateAnswerVariationRequest) returns (UpdateAnswerVariationResponse) {}
+    rpc GetQuestionAnswerVariations (GetSurveyAnswerVariationsRequest) returns (GetSurveyAnswerVariationsResponse) {}
+    rpc DeleteAnswerVariation (DeleteAnswerVariationRequest) returns (DeleteAnswerVariationResponse) {}
+
+    rpc GetSurveyReport (GetSurveyReportRequest) returns (GetSurveyReportResponse) {}
 }
