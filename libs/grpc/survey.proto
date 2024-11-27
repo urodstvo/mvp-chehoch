@@ -5,29 +5,190 @@ import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
 
-service Survey {
-    rpc CreateSurvey (CreateSurveyRequest) returns (CreateSurveyResponse) {}
-    rpc UpdateSurvey (UpdateSurveyRequest) returns (UpdateSurveyResponse) {}
-    rpc DeleteSurvey (DeleteSurveyRequest) returns (DeleteSurveyResponse) {}
+service SurveyService {
+    rpc CreateSurvey (CreateSurveyRequest) returns (google.protobuf.Empty) {}
+    rpc UpdateSurvey (UpdateSurveyRequest) returns (google.protobuf.Empty) {}
+    rpc DeleteSurvey (DeleteSurveyRequest) returns (google.protobuf.Empty) {}
     rpc GetSurveys (GetSurveysRequest) returns (GetSurveysResponse) {}
     rpc GetSurvey (GetSurveyRequest) returns (GetSurveyResponse) {}
     rpc GetOrganisationSurveys (GetOrganisationSurveysRequest) returns (GetOrganisationSurveysResponse) {}
-    rpc GetCompletedSurveys (GetCompletedSurveysRequest) returns (GetCompletedSurveysResponse) {}
+    rpc GetCompletedSurveys (google.protobuf.Empty) returns (GetCompletedSurveysResponse) {}
 
-    rpc AddTagsToSurvey (AddTagsToSurveyRequest) returns (AddTagsToSurveyResponse) {}
-    rpc DeleteTagsFromSurvey (DeleteTagsFromSurveyRequest) returns (DeleteTagsFromSurveyResponse) {}
+    rpc AddTagsToSurvey (AddTagsToSurveyRequest) returns (google.protobuf.Empty) {}
+    rpc DeleteTagsFromSurvey (DeleteTagsFromSurveyRequest) returns (google.protobuf.Empty) {}
 
-    rpc CreateQuestion (CreateQuestionRequest) returns (CreateQuestionResponse) {}
-    rpc UpdateQuestion (UpdateQuestionRequest) returns (UpdateQuestionResponse) {}
-    rpc DeleteQuestion (DeleteQuestionRequest) returns (DeleteQuestionResponse) {}
+    rpc CreateQuestion (CreateQuestionRequest) returns (google.protobuf.Empty) {}
+    rpc UpdateQuestion (UpdateQuestionRequest) returns (google.protobuf.Empty) {}
+    rpc DeleteQuestion (DeleteQuestionRequest) returns (google.protobuf.Empty) {}
     rpc GetSurveyQuestions (GetSurveyQuestionsRequest) returns (GetSurveyQuestionsResponse) {}
 
-    rpc UpdateAnswer (UpdateAnswerRequest) returns (UpdateAnswerResponse) {}
-    rpc GetQuestionAnswers (GetSurveyAnswersRequest) returns (GetSurveyAnswersResponse) {}
+    rpc UpdateAnswer (UpdateAnswerRequest) returns (google.protobuf.Empty) {}
+    rpc GetQuestionAnswers (GetQuestionAnswersRequest) returns (GetQuestionAnswersResponse) {}
 
-    rpc UpdateAnswerVariation (UpdateAnswerVariationRequest) returns (UpdateAnswerVariationResponse) {}
-    rpc GetQuestionAnswerVariations (GetSurveyAnswerVariationsRequest) returns (GetSurveyAnswerVariationsResponse) {}
-    rpc DeleteAnswerVariation (DeleteAnswerVariationRequest) returns (DeleteAnswerVariationResponse) {}
+    rpc UpdateAnswerVariation (UpdateAnswerVariationRequest) returns (google.protobuf.Empty) {}
+    rpc GetQuestionAnswerVariations (GetQuestionAnswerVariationsRequest) returns (GetQuestionAnswerVariationsResponse) {}
+    rpc DeleteAnswerVariation (DeleteAnswerVariationRequest) returns (google.protobuf.Empty) {}
 
     rpc GetSurveyReport (GetSurveyReportRequest) returns (GetSurveyReportResponse) {}
+    
+}
+
+message Survey {
+    int32 id = 1;
+    int32 questions_amount = 2;
+    int32 answers_amount = 3;
+    int32 created_by = 4;
+    int32 organisation_id = 5;
+    google.protobuf.Timestamp t_created_at = 6;
+    google.protobuf.Timestamp t_updated_at =7;
+    bool t_deleted = 8;
+}
+
+message Question {
+    int32 id = 1;
+    int32 survey_id = 2;
+    int32 type = 3;
+    string content = 4 ;
+    int32 answers_amount = 5;
+    google.protobuf.Timestamp t_created_at = 6;
+    google.protobuf.Timestamp t_updated_at = 7;
+    bool t_deleted = 8;
+}
+
+message Answer {
+    int32 id = 1;
+    int32 question_id = 2;
+    int32 user_id = 3;
+    int32 priority = 4;
+    google.protobuf.Timestamp t_created_at = 5;
+    google.protobuf.Timestamp t_updated_at = 6;
+    bool t_deleted = 7;
+}
+
+message AnswerVariation {
+    int32 id = 1;
+    int32 question_id = 2;
+    string content = 3;
+    google.protobuf.Timestamp t_created_at = 4;
+    google.protobuf.Timestamp t_updated_at = 5;
+    bool t_deleted = 6;
+}
+
+message CreateSurveyRequest {
+    int32 organisation_id = 1;
+    int32 created_by = 2;
+}
+
+message UpdateSurveyRequest {
+    int32 survey_id = 1;
+    optional string name = 2;
+    optional string description = 3;
+}
+
+message DeleteSurveyRequest {
+    int32 survey_id = 1;
+}
+
+message GetSurveysRequest {
+    repeated int32 organisation_ids = 1;
+}
+
+message GetSurveysResponse {
+    repeated Survey survey = 1;
+}
+
+message GetSurveyRequest {
+    int32 survey_id = 1;
+}
+
+message GetSurveyResponse {
+    Survey survey = 1;
+}
+
+message GetOrganisationSurveysRequest {
+    int32 organisation_id = 1;
+}
+
+message GetOrganisationSurveysResponse {
+    repeated Survey survey = 1;
+}
+
+message GetCompletedSurveysResponse {
+    repeated Survey survey = 1;
+}
+
+message AddTagsToSurveyRequest {
+    int32 survey_id = 1;
+    repeated int32 tags = 2;
+}
+
+message DeleteTagsFromSurveyRequest {
+    int32 survey_id = 1;
+    repeated int32 tags = 2;
+}
+
+message CreateQuestionRequest {
+    int32 survey_id = 1;
+    string content = 2;
+    int32 type = 3;
+}
+
+message UpdateQuestionRequest {
+    int32 question_id = 1;
+    optional string content = 2;
+    optional int32 type = 3;
+}
+
+message DeleteQuestionRequest {
+    int32 question_id = 1;
+}
+
+message GetSurveyQuestionsRequest {
+    int32 survey_id = 1;
+}
+
+message GetSurveyQuestionsResponse {
+    repeated Question question = 1;
+}
+
+message UpdateAnswerRequest {
+    int32 answer_id = 2;
+}
+
+message GetQuestionAnswersRequest {
+    int32 question_id = 1;
+}
+
+message GetQuestionAnswersResponse {
+    repeated Answer answer = 1;
+}
+
+message GetQuestionAnswerVariationsRequest {
+    int32 question_id = 1;
+}
+
+message GetQuestionAnswerVariationsResponse {
+    repeated AnswerVariation answer_variation = 1;
+}
+
+message UpdateAnswerVariationRequest {
+    int32 answer_variation_id = 1;
+    optional string content = 2;
+}
+
+message DeleteAnswerVariationRequest {
+    int32 answer_variation_id = 1;
+}
+
+message GetSurveyReportRequest {
+    int32 survey_id = 1;
+}
+
+
+// TODO: do it better
+message GetSurveyReportResponse {
+    Survey survey = 1;
+    repeated Question questions = 2;
+    repeated Answer answers = 3;
+    repeated AnswerVariation answer_variations = 4;
 }
