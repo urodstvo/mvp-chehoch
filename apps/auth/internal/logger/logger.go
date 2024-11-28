@@ -33,14 +33,12 @@ type Opts struct {
 	Level slog.Level
 }
 
-func NewFx(opts Opts) func(config config.Config) Logger {
-	return func(config config.Config) Logger {
-		return New(
-			Opts{
-				Env: config.AppEnv,
-			},
-		)
-	}
+func NewFx(config config.Config) Logger {
+	return New(
+		Opts{
+			Env: config.APP_ENV,
+		},
+	)
 }
 
 func New(opts Opts) Logger {

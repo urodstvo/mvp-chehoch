@@ -165,3 +165,4 @@ __generated__
 .idea
 
 .postgres
+.redis

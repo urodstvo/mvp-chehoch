@@ -1,62 +1,25 @@
 services:
-  adminer_auth:
-    container_name: "adminer-auth"
+  adminer:
     image: adminer
     restart: unless-stopped
     ports:
-      - "8081:8080"
+      - "8888:8080"
     environment:
-      - ADMINER_DEFAULT_SERVER=db-auth:5432
+      - ADMINER_DEFAULT_SERVER=postgres:5432
       - ADMINER_PLUGINS=enum-types enum-option json-column
     networks:
       - chehoch-dev
     depends_on:
-      postgres_auth:
+      postgres:
         condition: service_healthy
 
-  adminer_survey:
-    container_name: "adminer-survey"
-    image: adminer
-    restart: unless-stopped
-    ports:
-      - "8082:8080"
-    environment:
-      - ADMINER_DEFAULT_SERVER=db-survey:5433
-      - ADMINER_PLUGINS=enum-types enum-option json-column
-    networks:
-      - chehoch-dev
-    depends_on:
-      postgres_survey:
-        condition: service_healthy
-
-  postgres_auth:
-    container_name: "db-auth"
-    image: postgres:14-alpine
+  postgres:
+    image: postgres:17-alpine
     restart: unless-stopped
     volumes:
-      - .postgres/auth:/var/lib/postgresql/data
+      - .postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    environment:
-      POSTGRES_USER: urodstvo
-      POSTGRES_PASSWORD: urodstvo
-      POSTGRES_DB: urodstvo
-    networks:
-      - chehoch-dev
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U urodstvo"]
-      interval: 2s
-      timeout: 5s
-      retries: 10
-
-  postgres_survey:
-    container_name: "db-survey"
-    image: postgres:14-alpine
-    restart: unless-stopped
-    volumes:
-      - .postgres/survey:/var/lib/postgresql/data
-    ports:
-      - "5433:5432"
     environment:
       POSTGRES_USER: urodstvo
       POSTGRES_PASSWORD: urodstvo
@@ -77,7 +40,7 @@ services:
       - "6379:6379"
       - "8800:8001"
     volumes:
-      - redis-data:/data
+      - .redis:/data
     networks:
       - chehoch-dev
 
