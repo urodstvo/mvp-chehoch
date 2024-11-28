@@ -1,7 +1,3 @@
-# команда для автогенерации миграции
-# alembic revision --message="Your text" --autogenerate
-# alembic upgrade head
-
 from typing import AsyncIterator
 
 from sqlalchemy.exc import SQLAlchemyError
