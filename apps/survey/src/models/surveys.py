@@ -1,6 +1,6 @@
 
 from sqlalchemy import (
-     Column, BigInteger, SmallInteger, Boolean, ForeignKey, TIMESTAMP, text
+     Column, BigInteger, SmallInteger, Boolean, ForeignKey, TIMESTAMP, text, String, Text
 )
 from config.db import Base
 
@@ -8,6 +8,8 @@ class Survey(Base):
     __tablename__ = 'surveys'
 
     id = Column(BigInteger, primary_key=True, autoincrement=True)
+    name = Column(String(256), nullable=False, unique=True)
+    description = Column(Text, nullable=True)
     questions_amount = Column(SmallInteger, nullable=True)
     answers_amount = Column(BigInteger, nullable=True)
     created_by = Column(BigInteger, ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
