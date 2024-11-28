@@ -12,7 +12,8 @@ service SurveyService {
     rpc GetSurveys (GetSurveysRequest) returns (GetSurveysResponse) {}
     rpc GetSurvey (GetSurveyRequest) returns (GetSurveyResponse) {}
     rpc GetOrganisationSurveys (GetOrganisationSurveysRequest) returns (GetOrganisationSurveysResponse) {}
-    rpc GetCompletedSurveys (google.protobuf.Empty) returns (GetCompletedSurveysResponse) {}
+    rpc GetCompletedSurveys (google.protobuf.Empty) returns (GetCompletedSurveysResponse) {}    
+    rpc CompleteSurvey (CompleteSurveyRequest) returns (google.protobuf.Empty) {}
 
     rpc AddTagsToSurvey (AddTagsToSurveyRequest) returns (google.protobuf.Empty) {}
     rpc DeleteTagsFromSurvey (DeleteTagsFromSurveyRequest) returns (google.protobuf.Empty) {}
@@ -21,6 +22,7 @@ service SurveyService {
     rpc UpdateQuestion (UpdateQuestionRequest) returns (google.protobuf.Empty) {}
     rpc DeleteQuestion (DeleteQuestionRequest) returns (google.protobuf.Empty) {}
     rpc GetSurveyQuestions (GetSurveyQuestionsRequest) returns (GetSurveyQuestionsResponse) {}
+    rpc CompleteQuestion (CompleteQuestionRequest) returns (google.protobuf.Empty) {}
 
     rpc UpdateAnswer (UpdateAnswerRequest) returns (google.protobuf.Empty) {}
     rpc GetQuestionAnswers (GetQuestionAnswersRequest) returns (GetQuestionAnswersResponse) {}
@@ -189,6 +191,20 @@ message GetSurveyReportRequest {
 message GetSurveyReportResponse {
     Survey survey = 1;
     repeated Question questions = 2;
-    repeated Answer answers = 3;
-    repeated AnswerVariation answer_variations = 4;
+    repeated AnswerVariation answer_variations = 3;
+    repeated Answer answers = 4;
+}
+
+message CompleteSurveyRequest {
+    int32 survey_id = 1;
+}
+
+message ChoosenAnswer {
+    int32 answer_variation_id = 1;
+    optional int32 priority = 2;
+}
+
+message CompleteQuestionRequest {
+    int32 question_id = 1;
+    repeated ChoosenAnswer answers = 2;
 }
