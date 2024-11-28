@@ -17,4 +17,4 @@ except grpc.FutureTimeoutError:
     sys.exit('Error connecting to server')
 else:
     AuthServiceClient = auth_service.AuthStub(_auth_channel)
-    SurveyServiceClient = survey_service.SurveyStub(_survey_channel)
+    SurveyServiceClient = survey_service.SurveyServiceStub(_survey_channel)
