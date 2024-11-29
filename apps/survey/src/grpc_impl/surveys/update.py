@@ -1,7 +1,7 @@
 from google.protobuf.empty_pb2 import Empty
 from grpc import ServicerContext, StatusCode
 from config.db import Session
-from models.surveys import Survey 
+from src.models.surveys import Survey 
 
 def UpdateSurvey(request, context: ServicerContext):
     try:
@@ -12,10 +12,10 @@ def UpdateSurvey(request, context: ServicerContext):
                 context.set_details("Survey not found")
                 return Empty()  
             
-            if request.name is not None:
+            if request.name:
                 survey.name = request.name
                 
-            if request.description is not None:
+            if request.description:
                 survey.description = request.description
 
             session.commit()

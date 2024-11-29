@@ -12,9 +12,13 @@ echo [1/3] Creating files...
 IF NOT EXIST ".\libs\grpc\__generated__" (   
     mkdir ".\libs\grpc\__generated__"
 ) 
-IF NOT EXIST ".\libs\grpc\__generated__\__init__.py" (
-    echo. > ".\libs\grpc\__generated__\__init__.py"
-)
+IF NOT EXIST ".\apps\survey\__generated__" (   
+    mkdir ".\apps\survey\__generated__"
+) 
+IF NOT EXIST ".\apps\api\__generated__" (   
+    mkdir ".\apps\api\__generated__"
+) 
+
 
 echo [2/3] Creating venv...
 IF NOT EXIST ".\apps\survey\venv" ( 
@@ -38,9 +42,10 @@ IF NOT EXIST ".\apps\api\venv" (
 echo [3/3] Generating proto...
 cd %current_dir% && (
     call .\apps\survey\venv\Scripts\activate.bat
-    python -m grpc_tools.protoc -I .\libs\grpc --python_out=.\libs\grpc\__generated__ --grpc_python_out=.\libs\grpc\__generated__ .\libs\grpc\survey.proto
+    python -m grpc_tools.protoc -I .\libs\grpc --python_out=.\apps\survey --grpc_python_out=.\apps\survey .\libs\grpc\survey.proto
+    python -m grpc_tools.protoc -I .\libs\grpc --python_out=.\apps\api\__generated__ --grpc_python_out=.\apps\api\__generated__ .\libs\grpc\survey.proto
     python -m grpc_tools.protoc -I .\libs\grpc --go_out=.\libs\grpc\__generated__ --go-grpc_out=.\libs\grpc\__generated__ .\libs\grpc\auth.proto
-    python -m grpc_tools.protoc -I .\libs\grpc --python_out=.\libs\grpc\__generated__ --grpc_python_out=.\libs\grpc\__generated__ .\libs\grpc\auth.proto
+    python -m grpc_tools.protoc -I .\libs\grpc --python_out=.\apps\api\__generated__ --grpc_python_out=.\apps\api\__generated__ .\libs\grpc\auth.proto
     call .\apps\survey\venv\Scripts\deactivate.bat
 )
 

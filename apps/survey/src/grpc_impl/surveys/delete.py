@@ -3,7 +3,7 @@ from google.protobuf.empty_pb2 import Empty
 from grpc import ServicerContext, StatusCode
 from config.db import Session
 from sqlalchemy import update
-from models.surveys import Survey 
+from src.models.surveys import Survey 
 
 def DeleteSurvey(request, context: ServicerContext):
     try:

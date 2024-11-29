@@ -1,19 +1,13 @@
-from config.variables import ENVIRONMENT 
 from config.logger import logger
 
 import grpc
 from concurrent import futures
 
-from libs.grpc.__generated__ import survey_pb2_grpc as survey_service
+import survey_pb2_grpc as survey_service
 from src.service import SurveyService
 
-from dotenv import load_dotenv
 
 if __name__ == "__main__":
-    if ENVIRONMENT == "development":
-        load_dotenv("../../.env")
-
-
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     survey_service.add_SurveyServiceServicer_to_server(SurveyService(), server)
     logger.info("Starting Survey Service GRPC in port ::8001")

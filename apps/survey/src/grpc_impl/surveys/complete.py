@@ -1,8 +1,8 @@
 from google.protobuf.empty_pb2 import Empty
 from grpc import ServicerContext, StatusCode
 from config.db import Session
-from models.users_surveys import UserSurvey 
-from models.surveys import Survey
+from src.models.users_surveys import UserSurvey 
+from src.models.surveys import Survey
 from sqlalchemy import update
 from datetime import datetime
 

@@ -1,7 +1,8 @@
 from google.protobuf.empty_pb2 import Empty
 from grpc import ServicerContext, StatusCode
 from config.db import Session
-from models.surveys import Survey 
+from src.models.surveys import Survey 
+from config.logger import logger
 
 def CreateSurvey(request, context: ServicerContext):
     try:
@@ -15,5 +16,6 @@ def CreateSurvey(request, context: ServicerContext):
     except Exception as e:
         context.set_code(StatusCode.INTERNAL)
         context.set_details(str(e))
+        logger.error(str(e))
 
     return Empty()

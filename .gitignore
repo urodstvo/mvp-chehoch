@@ -166,3 +166,5 @@ __generated__
 
 .postgres
 .redis
+
+*_pb2*.py

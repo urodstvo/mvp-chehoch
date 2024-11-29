@@ -1,7 +1,7 @@
 from google.protobuf.empty_pb2 import Empty
 from grpc import ServicerContext, StatusCode
 from config.db import Session
-from models.survey_tags import SurveyTag
+from src.models.survey_tags import SurveyTag
 
 def AddTagsToSurvey(request, context: ServicerContext):
     try:
