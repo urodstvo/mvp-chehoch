@@ -6,7 +6,7 @@ from src.models.answers import Answer
 from src.models.choices import Choice
 from src.models.user_answers import UserAnswer
 from datetime import datetime
-
+#
 
 def CompleteQuestion(request, context: ServicerContext):
     try:
