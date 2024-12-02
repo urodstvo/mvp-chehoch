@@ -30,6 +30,9 @@ class SurveyService(survey_pb2_grpc.SurveyServiceServicer):
     def CompleteSurvey(self, request, context):
         return CompleteSurvey(request, context)
     
+    def GetSurveyTags(self, request, context):
+        return GetSurveyTags(request, context)
+    
     def AddTagsToSurvey(self, request, context):
         return AddTagsToSurvey(request, context)
     

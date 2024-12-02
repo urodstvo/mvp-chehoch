@@ -15,6 +15,7 @@ service SurveyService {
     rpc GetOrganisationSurveys (GetOrganisationSurveysRequest) returns (GetOrganisationSurveysResponse) {}
     rpc GetCompletedSurveys (GetCompletedSurveysRequest) returns (GetCompletedSurveysResponse) {}    
     rpc CompleteSurvey (CompleteSurveyRequest) returns (google.protobuf.Empty) {}
+    rpc GetSurveyTags (GetSurveyTagsRequest) returns (GetSurveyTagsResponse) {}
 
     rpc AddTagsToSurvey (AddTagsToSurveyRequest) returns (google.protobuf.Empty) {}
     rpc DeleteTagsFromSurvey (DeleteTagsFromSurveyRequest) returns (google.protobuf.Empty) {}
@@ -33,7 +34,16 @@ service SurveyService {
     rpc DeleteAnswerVariation (DeleteAnswerVariationRequest) returns (google.protobuf.Empty) {}
 
     rpc GetSurveyReport (GetSurveyReportRequest) returns (GetSurveyReportResponse) {}
+
     
+}
+
+message Tag {
+    int64 id = 1;
+    string name = 2;
+    google.protobuf.Timestamp t_created_at = 3; 
+    google.protobuf.Timestamp t_updated_at = 4; 
+    bool t_deleted = 5;
 }
 
 message Survey {
@@ -217,4 +227,12 @@ message CompleteQuestionRequest {
 
 message GetCompletedSurveysRequest {
     int32 user_id = 1;
+}
+
+message GetSurveyTagsRequest {
+    int32 survey_id = 1;
+}
+
+message GetSurveyTagsResponse {
+    repeated Tag tags = 1;
 }
