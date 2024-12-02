@@ -1,16 +1,35 @@
 # from typing import AsyncIterator
 # from sqlalchemy.exc import SQLAlchemyError
-# from sqlalchemy import MetaData
+from sqlalchemy import MetaData
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 
+# from src.models.surveys import Survey
+
 from .variables import DATABASE_URL
 
-Base = declarative_base()
 engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
+
+metadata = MetaData(schema='public')
+metadata.reflect(bind=engine)
+Base = declarative_base(metadata=metadata)
+
+# session = Session()
+
+# # Пример вставки
+# try:
+#     new_survey = Survey(
+#         created_by=3,
+#         organisation_id=1
+#     )
+#     session.add(new_survey)
+#     session.commit()
+#     print("Survey added successfully")
+# except Exception as e:
+#     print(f"Error: {e}")
 
 
 # engine = create_async_engine(DATABASE_URL, future=True, echo=True)

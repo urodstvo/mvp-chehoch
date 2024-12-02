@@ -3,6 +3,7 @@ syntax = "proto3";
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 
 
 service SurveyService {
@@ -12,8 +13,9 @@ service SurveyService {
     rpc GetSurveys (GetSurveysRequest) returns (GetSurveysResponse) {}
     rpc GetSurvey (GetSurveyRequest) returns (GetSurveyResponse) {}
     rpc GetOrganisationSurveys (GetOrganisationSurveysRequest) returns (GetOrganisationSurveysResponse) {}
-    rpc GetCompletedSurveys (google.protobuf.Empty) returns (GetCompletedSurveysResponse) {}    
+    rpc GetCompletedSurveys (GetCompletedSurveysRequest) returns (GetCompletedSurveysResponse) {}    
     rpc CompleteSurvey (CompleteSurveyRequest) returns (google.protobuf.Empty) {}
+    rpc GetSurveyTags (GetSurveyTagsRequest) returns (GetSurveyTagsResponse) {}
 
     rpc AddTagsToSurvey (AddTagsToSurveyRequest) returns (google.protobuf.Empty) {}
     rpc DeleteTagsFromSurvey (DeleteTagsFromSurveyRequest) returns (google.protobuf.Empty) {}
@@ -32,25 +34,36 @@ service SurveyService {
     rpc DeleteAnswerVariation (DeleteAnswerVariationRequest) returns (google.protobuf.Empty) {}
 
     rpc GetSurveyReport (GetSurveyReportRequest) returns (GetSurveyReportResponse) {}
+
     
+}
+
+message Tag {
+    int64 id = 1;
+    string name = 2;
+    google.protobuf.Timestamp t_created_at = 3; 
+    google.protobuf.Timestamp t_updated_at = 4; 
+    bool t_deleted = 5;
 }
 
 message Survey {
     int32 id = 1;
-    int32 questions_amount = 2;
-    int32 answers_amount = 3;
-    int32 created_by = 4;
-    int32 organisation_id = 5;
-    google.protobuf.Timestamp t_created_at = 6;
-    google.protobuf.Timestamp t_updated_at =7;
-    bool t_deleted = 8;
+    google.protobuf.StringValue name = 2;
+    google.protobuf.StringValue description = 3;
+    int32 questions_amount = 4;
+    int32 answers_amount = 5;
+    int32 created_by = 6;
+    int32 organisation_id = 7;
+    google.protobuf.Timestamp t_created_at = 8;
+    google.protobuf.Timestamp t_updated_at = 9;
+    bool t_deleted = 10;
 }
 
 message Question {
     int32 id = 1;
     int32 survey_id = 2;
-    int32 type = 3;
-    string content = 4 ;
+    google.protobuf.Int32Value type = 3;
+    google.protobuf.StringValue content = 4 ;
     int32 answers_amount = 5;
     google.protobuf.Timestamp t_created_at = 6;
     google.protobuf.Timestamp t_updated_at = 7;
@@ -61,7 +74,7 @@ message Answer {
     int32 id = 1;
     int32 question_id = 2;
     int32 user_id = 3;
-    int32 priority = 4;
+    google.protobuf.Int32Value priority = 4;
     google.protobuf.Timestamp t_created_at = 5;
     google.protobuf.Timestamp t_updated_at = 6;
     bool t_deleted = 7;
@@ -92,7 +105,7 @@ message DeleteSurveyRequest {
 }
 
 message GetSurveysRequest {
-    repeated int32 organisation_ids = 1;
+    repeated int32 surveys_ids = 1;
 }
 
 message GetSurveysResponse {
@@ -210,4 +223,16 @@ message CompleteQuestionRequest {
     int32 question_id = 1;
     repeated ChoosenAnswer answers = 2;
     int32 user_id = 3;
+}
+
+message GetCompletedSurveysRequest {
+    int32 user_id = 1;
+}
+
+message GetSurveyTagsRequest {
+    int32 survey_id = 1;
+}
+
+message GetSurveyTagsResponse {
+    repeated Tag tags = 1;
 }
