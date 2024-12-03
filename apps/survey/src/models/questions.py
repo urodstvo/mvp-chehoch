@@ -14,4 +14,4 @@ class Question(Base):
     # t_deleted = Column(Boolean, server_default=text('FALSE'), nullable=False)
 
     def __repr__(self):
-        return f"<SurveyTag(id={self.id}, survey={self.survey}, type={self.type}, t_created_at={self.t_created_at}, t_updated_at={self.t_updated_at}, t_deleted={self.t_deleted})>"
+        return f"<Question(id={self.id}, survey={self.survey}, type={self.type}, t_created_at={self.t_created_at}, t_updated_at={self.t_updated_at}, t_deleted={self.t_deleted})>"

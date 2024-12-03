@@ -1,6 +1,7 @@
 import survey_pb2_grpc
 from src.grpc_impl.surveys import *
 from src.grpc_impl.tags import *
+from src.grpc_impl.questions import *
 
 
 class SurveyService(survey_pb2_grpc.SurveyServiceServicer):
@@ -39,3 +40,17 @@ class SurveyService(survey_pb2_grpc.SurveyServiceServicer):
     def DeleteTagsFromSurvey(self, request, context):
         return DeleteTagsFromSurvey(request, context)
     
+    def CreateQuestion(self, request, context):
+        return CreateQuestion(request, context)
+    
+    def UpdateQuestion(self, request, context):
+        return UpdateQuestion(request, context)
+    
+    def DeleteQuestion(self, request, context):
+        return DeleteQuestion(request, context)
+    
+    def GetSurveyQuestions(self, request, context):
+        return GetSurveyQuestions(request, context)
+    
+    def CompleteQuestion(self, request, context):
+        return CompleteQuestion(request, context)
