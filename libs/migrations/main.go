@@ -37,7 +37,7 @@ func main() {
 	if err := goose.Up(db, "sql", goose.WithAllowMissing()); err != nil {
 		panic(err)
 	}
-	// if err := goose.DownTo(db, "sql", 20241030142542, goose.WithAllowMissing()); err != nil {
+	// if err := goose.DownTo(db, "sql", 5, goose.WithAllowMissing()); err != nil {
 	// 	panic(err)
 	// }
 
