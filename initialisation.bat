@@ -43,9 +43,9 @@ echo [3/3] Generating proto...
 cd %current_dir% && (
     call .\apps\survey\venv\Scripts\activate.bat
     python -m grpc_tools.protoc -I .\libs\grpc --python_out=.\apps\survey --grpc_python_out=.\apps\survey .\libs\grpc\survey.proto
-    python -m grpc_tools.protoc -I .\libs\grpc --python_out=.\apps\api\__generated__ --grpc_python_out=.\apps\api\__generated__ .\libs\grpc\survey.proto
+    python -m grpc_tools.protoc -I .\libs\grpc --python_out=.\apps\api --grpc_python_out=.\apps\api .\libs\grpc\survey.proto
     python -m grpc_tools.protoc -I .\libs\grpc --go_out=.\libs\grpc\__generated__ --go-grpc_out=.\libs\grpc\__generated__ .\libs\grpc\auth.proto
-    python -m grpc_tools.protoc -I .\libs\grpc --python_out=.\apps\api\__generated__ --grpc_python_out=.\apps\api\__generated__ .\libs\grpc\auth.proto
+    python -m grpc_tools.protoc -I .\libs\grpc --python_out=.\apps\api --grpc_python_out=.\apps\api .\libs\grpc\auth.proto
     call .\apps\survey\venv\Scripts\deactivate.bat
 )
 

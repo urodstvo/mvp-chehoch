@@ -1,5 +1,7 @@
 import sys
 import grpc
+from minio import Minio
+from config.variables import MINIO_URL, MINIO_SECRET, MINIO_ACCESS
 
 from libs.grpc.__generated__  import auth_pb2_grpc as auth_service
 from libs.grpc.__generated__  import survey_pb2_grpc as survey_service
@@ -18,3 +20,10 @@ except grpc.FutureTimeoutError:
 else:
     AuthServiceClient = auth_service.AuthStub(_auth_channel)
     SurveyServiceClient = survey_service.SurveyServiceStub(_survey_channel)
+
+MinioClient = Minio(
+    MINIO_URL,
+    secure=False,
+    access_key=MINIO_ACCESS,
+    secret_key=MINIO_SECRET
+)
