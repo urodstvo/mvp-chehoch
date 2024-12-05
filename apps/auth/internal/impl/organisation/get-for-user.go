@@ -2,16 +2,25 @@ package organisation
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/urodstvo/mvp-chehoch/apps/auth/internal/helpers"
 	"github.com/urodstvo/mvp-chehoch/apps/auth/internal/models"
 	proto "github.com/urodstvo/mvp-chehoch/libs/grpc/__generated__"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
-func (h *Organisation) GetOrganisations(ctx context.Context, req *proto.GetOrganisationsRequest) (*proto.GetOrganisationsResponse, error) {
-	getOrgQuery := squirrel.Select("*").From(models.Organisation{}.TableName()).Where(squirrel.Eq{"id": req.OrganisationIds, "t_deleted": false}).PlaceholderFormat(squirrel.Dollar)
+func (h *Organisation) GetUserOrganisations(ctx context.Context, req *emptypb.Empty) (*proto.GetUserOrganisationsResponse, error) {
+	user, err := helpers.GetUserFromContext(ctx)
+	if err != nil {
+		h.Logger.Error("Error while getting user from context", slog.String("error", err.Error()))
+		return nil, err
+	}
+
+	getOrgQuery := squirrel.Select("*").From(models.Organisation{}.TableName()).Where(squirrel.Eq{"t_deleted": false, "supervisor": user.Id}).PlaceholderFormat(squirrel.Dollar)
 
 	var orgs []*proto.Organisation
 
@@ -72,6 +81,6 @@ func (h *Organisation) GetOrganisations(ctx context.Context, req *proto.GetOrgan
 		orgs = append(orgs, wrapper)
 	}
 
-	return &proto.GetOrganisationsResponse{Organisations: orgs}, nil
+	return &proto.GetUserOrganisationsResponse{Organisations: orgs}, nil
 
 }

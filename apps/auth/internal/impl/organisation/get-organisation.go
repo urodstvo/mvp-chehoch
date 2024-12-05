@@ -11,11 +11,11 @@ import (
 )
 
 func (h *Organisation) GetOrganisation(ctx context.Context, req *proto.GetOrganisationRequest) (*proto.GetOrganisationResponse, error) {
-	getUserQuery := squirrel.Select("*").From(models.Organisation{}.TableName()).Where(squirrel.Eq{"id": req.OrganisationId, "t_deleted": "false"}).PlaceholderFormat(squirrel.Dollar)
+	getOrganisationQuery := squirrel.Select("*").From(models.Organisation{}.TableName()).Where(squirrel.Eq{"id": req.OrganisationId, "t_deleted": false}).PlaceholderFormat(squirrel.Dollar)
 
 	var org models.Organisation
 
-	err := getUserQuery.RunWith(h.DB).QueryRowContext(ctx).Scan(&org.Id, &org.Supervisor, &org.Name, &org.Email, &org.Phone, &org.Address, &org.WebSite, &org.INN,
+	err := getOrganisationQuery.RunWith(h.DB).QueryRowContext(ctx).Scan(&org.Id, &org.Supervisor, &org.Name, &org.Email, &org.Phone, &org.Address, &org.WebSite, &org.INN,
 		&org.TCreatedAt, &org.TUpdatedAt, &org.TDeleted)
 	if err != nil {
 		h.Logger.Error("Error while getting organisation")

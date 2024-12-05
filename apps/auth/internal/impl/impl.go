@@ -107,3 +107,7 @@ func (i Impl) UpdateOrganisation(ctx context.Context, req *proto.UpdateOrganisat
 func (i Impl) UpdateUser(ctx context.Context, req *proto.UpdateUserRequest) (*emptypb.Empty, error) {
 	return i.User.UpdateUser(ctx, req)
 }
+
+func (i Impl) GetUserOrganisations(ctx context.Context, req *emptypb.Empty) (*proto.GetUserOrganisationsResponse, error) {
+	return i.Organisation.GetUserOrganisations(ctx, req)
+}

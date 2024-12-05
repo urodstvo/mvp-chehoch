@@ -4,22 +4,23 @@ from fastapi.middleware import BaseHTTPMiddleware
 from google.protobuf.empty_pb2 import Empty
 from src.clients import AuthServiceClient
 
-class SessionCheckMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        # Extract session_id from cookies
-        session_id = request.cookies.get("session_id")
+async def check_session(request: Request):
+    # Extract session_id from cookies
+    session_id = request.cookies.get("session_id")
+    
+    if not session_id:
+        raise HTTPException(status_code=401, detail="Session ID missing")
+
+    try:
+        metadata = (("session_id", session_id),)
+        response = AuthServiceClient.CheckSession(Empty(), metadata=metadata)
         
-        if not session_id:
-            raise HTTPException(status_code=401, detail="Session ID missing")
+        if not response.valid:
+            raise HTTPException(status_code=401, detail="Invalid session")
+        
+        # Optionally refresh the session if needed
+        AuthServiceClient.RefreshSession(Empty(), metadata=metadata)
 
-        try:
-            metadata = (("session_id", session_id),)
-            response = AuthServiceClient.CheckSession(Empty(), metadata=metadata)
-            if not response.valid:
-                raise HTTPException(status_code=401, detail="Invalid session")
-            
-        except grpc.RpcError as e:
-            # Handle gRPC errors (e.g., server unavailable)
-            raise HTTPException(status_code=500, detail=f"gRPC error: {e.details()}")
-
-        return await call_next(request)
+    except grpc.RpcError as e:
+        # Handle gRPC errors (e.g., server unavailable)
+        raise HTTPException(status_code=500, detail=f"gRPC error: {e.details()}")

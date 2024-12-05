@@ -33,6 +33,7 @@ service Auth {
     rpc GetOrganisations(GetOrganisationsRequest) returns (GetOrganisationsResponse) {}
     rpc UpdateOrganisation(UpdateOrganisationRequest) returns (google.protobuf.Empty) {}
     rpc DeleteOrganisation(DeleteOrganisationRequest) returns (google.protobuf.Empty) {}
+    rpc GetUserOrganisations(google.protobuf.Empty) returns (GetUserOrganisationsResponse) {}
 
 }
 
@@ -239,4 +240,8 @@ message AddTagsToUserRequest {
 
 message DeleteTagsFromUserRequest {
     repeated int64 tags = 1;
+}
+
+message GetUserOrganisationsResponse {
+    repeated Organisation organisations = 1;
 }
