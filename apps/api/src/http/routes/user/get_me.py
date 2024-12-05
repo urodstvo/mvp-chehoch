@@ -3,7 +3,7 @@ import src.models as models
 from src.clients import AuthServiceClient
 from google.protobuf.empty_pb2 import Empty
 from fastapi import Cookie, HTTPException
-from .dto import UserWithProfile
+from .dto.get_me import UserWithProfile
 
 import auth_pb2
 

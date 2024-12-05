@@ -3,8 +3,8 @@ import grpc
 from minio import Minio
 from config.variables import MINIO_URL, MINIO_SECRET, MINIO_ACCESS
 
-from libs.grpc.__generated__  import auth_pb2_grpc as auth_service
-from libs.grpc.__generated__  import survey_pb2_grpc as survey_service
+import auth_pb2_grpc as auth_service
+import survey_pb2_grpc as survey_service
 
 
 AuthServiceClient = None

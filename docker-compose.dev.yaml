@@ -51,9 +51,8 @@ services:
       - "9001:9001"
     volumes:
       - .minio:/data
+      - .minio-config:/root/.minio
     environment:
-      MINIO_ACCESS_KEY: ${MINIO_ACCESS}
-      MINIO_SECRET_KEY: ${MINIO_SECRET}
       MINIO_ROOT_USER: urodstvo
       MINIO_ROOT_PASSWORD: urodstvo
     command: server --address 0.0.0.0:9000 --console-address ":9001" /data
@@ -62,6 +61,7 @@ volumes:
   .redis:
   .postgres:
   .minio:
+  .minio-config:
 
 networks:
   chehoch-dev:

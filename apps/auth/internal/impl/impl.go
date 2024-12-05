@@ -111,3 +111,7 @@ func (i Impl) UpdateUser(ctx context.Context, req *proto.UpdateUserRequest) (*em
 func (i Impl) GetUserOrganisations(ctx context.Context, req *emptypb.Empty) (*proto.GetUserOrganisationsResponse, error) {
 	return i.Organisation.GetUserOrganisations(ctx, req)
 }
+
+func (i Impl) GetUserTags(ctx context.Context, req *emptypb.Empty) (*proto.GetUserTagsResponse, error) {
+	return i.User.GetUserTags(ctx, req)
+}

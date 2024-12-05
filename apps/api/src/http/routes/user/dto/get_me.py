@@ -6,4 +6,4 @@ class UserWithProfile(BaseModel):
     profile: Profile
 
     class Config:
-        orm_mode = True  # Allow conversion from ORM models to Pydantic models
+        from_attributes = True  # Allow conversion from ORM models to Pydantic models

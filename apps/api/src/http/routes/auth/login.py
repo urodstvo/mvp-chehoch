@@ -1,4 +1,3 @@
-from .auth import router
 from .dto.login import LoginRequest
 from fastapi import Response
 

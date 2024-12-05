@@ -7,7 +7,7 @@ from .create import create_organisation
 from .update import update_organisation
 from .delete import delete_organisation
 
-from src.middeware import check_session
+from src.middleware import check_session
 from src.models import Organisation
 
 router = APIRouter(prefix="/organisation")

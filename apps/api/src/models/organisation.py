@@ -18,7 +18,7 @@ class Organisation(BaseModel):
     t_deleted: bool
 
     class Config:
-        orm_mode = True  # Optional: allows compatibility with ORM models (if using ORM)
+        from_attributes = True  # Optional: allows compatibility with ORM models (if using ORM)
     
     # Convert StringValue to string
     @staticmethod

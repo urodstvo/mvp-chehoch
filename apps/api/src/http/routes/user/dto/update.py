@@ -13,4 +13,4 @@ class UpdateUserRequest(BaseModel):
     education_level: Optional[str] = None
 
     class Config:
-        orm_mode = True  # Allows compatibility with ORM models (if using ORM)
+        from_attributes = True  # Allows compatibility with ORM models (if using ORM)

@@ -10,4 +10,4 @@ class UpdateOrganisationRequest(BaseModel):
     web_site: Optional[str] = None
 
     class Config:
-        orm_mode = True  # Enable ORM mode if needed
+        from_attributes = True  # Enable ORM mode if needed

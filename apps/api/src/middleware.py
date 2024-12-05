@@ -1,6 +1,5 @@
 import grpc
 from fastapi import Request, HTTPException
-from fastapi.middleware import BaseHTTPMiddleware
 from google.protobuf.empty_pb2 import Empty
 from src.clients import AuthServiceClient
 

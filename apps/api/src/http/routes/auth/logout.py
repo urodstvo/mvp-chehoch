@@ -1,4 +1,3 @@
-from .auth import router
 from fastapi import Cookie, Response
 
 from src.clients import AuthServiceClient

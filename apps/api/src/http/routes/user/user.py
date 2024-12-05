@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends
 
 
-from src.middeware import check_session
+from src.middleware import check_session
 
 from .get_me import get_user_from_session
 from .update import update_user
-from .dto import UserWithProfile
+from .dto.get_me import UserWithProfile
 
 
 router = APIRouter(prefix="/user")

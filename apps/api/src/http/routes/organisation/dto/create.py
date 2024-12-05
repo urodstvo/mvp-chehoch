@@ -10,4 +10,4 @@ class CreateOrganisationRequest(BaseModel):
     web_site: Optional[str] = None
 
     class Config:
-        orm_mode = True  # Enable ORM mode if you need to use it with ORM models
+        from_attributes = True  # Enable ORM mode if you need to use it with ORM models

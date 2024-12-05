@@ -1,4 +1,3 @@
-from .auth import router
 from .dto.register import RegisterRequest
 from fastapi import Response
 
