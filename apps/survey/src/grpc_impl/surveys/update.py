@@ -1,3 +1,4 @@
+from datetime import datetime
 from google.protobuf.empty_pb2 import Empty
 from grpc import ServicerContext, StatusCode
 from config.db import Session
@@ -17,6 +18,8 @@ def UpdateSurvey(request, context: ServicerContext):
                 
             if request.description:
                 survey.description = request.description
+            
+            survey.updated_at = datetime.now()
 
             session.commit()
     except Exception as e:

@@ -2,6 +2,8 @@ import survey_pb2_grpc
 from src.grpc_impl.surveys import *
 from src.grpc_impl.tags import *
 from src.grpc_impl.questions import *
+from src.grpc_impl.answers import *
+from src.grpc_impl.answer_variants import *
 
 
 class SurveyService(survey_pb2_grpc.SurveyServiceServicer):
@@ -54,3 +56,18 @@ class SurveyService(survey_pb2_grpc.SurveyServiceServicer):
     
     def CompleteQuestion(self, request, context):
         return CompleteQuestion(request, context)
+    
+    def GetQuestionAnswers(self, request, context):
+        return GetQuestionAnswers(request, context)
+    
+    def UpdateAnswerVariant(self, request, context):
+        return UpdateAnswerVariant(request, context)
+    
+    def GetQuestionAnswerVariants(self, request, context):
+        return GetQuestionAnswerVariants(request, context)
+    
+    def DeleteAnswerVariant(self, request, context):
+        return DeleteAnswerVariant(request, context)
+    
+    def GetSurveyReport(self, request, context):
+        return GetSurveyReport(request, context)

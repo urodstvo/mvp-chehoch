@@ -19,7 +19,7 @@ def CompleteQuestion(request, context: ServicerContext):
             ).first()
             
             question.answers_amount += 1
-            survey.answers_amount +=1
+            survey.answers_amount += 1
 
             # Создание записи о выбранном ответе
             user_answers = []
@@ -27,7 +27,7 @@ def CompleteQuestion(request, context: ServicerContext):
                 answer = Answer(
                     question_id=request.question_id,
                     created_by=request.user_id,
-                    answer_variant_id=v.answer_variation_id,
+                    answer_variant_id=v.answer_variant_id,
                     priority=v.priority,
                     content=v.content
                 )
