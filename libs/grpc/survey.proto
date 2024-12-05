@@ -26,12 +26,12 @@ service SurveyService {
     rpc GetSurveyQuestions (GetSurveyQuestionsRequest) returns (GetSurveyQuestionsResponse) {}
     rpc CompleteQuestion (CompleteQuestionRequest) returns (google.protobuf.Empty) {}
 
-    rpc UpdateAnswer (UpdateAnswerRequest) returns (google.protobuf.Empty) {}
+    // rpc UpdateAnswer (UpdateAnswerRequest) returns (google.protobuf.Empty) {}
     rpc GetQuestionAnswers (GetQuestionAnswersRequest) returns (GetQuestionAnswersResponse) {}
 
-    rpc UpdateAnswerVariation (UpdateAnswerVariationRequest) returns (google.protobuf.Empty) {}
-    rpc GetQuestionAnswerVariations (GetQuestionAnswerVariationsRequest) returns (GetQuestionAnswerVariationsResponse) {}
-    rpc DeleteAnswerVariation (DeleteAnswerVariationRequest) returns (google.protobuf.Empty) {}
+    rpc UpdateAnswerVariant (UpdateAnswerVariantRequest) returns (google.protobuf.Empty) {}
+    rpc GetQuestionAnswerVariants (GetQuestionAnswerVariantsRequest) returns (GetQuestionAnswerVariantsResponse) {}
+    rpc DeleteAnswerVariant (DeleteAnswerVariantRequest) returns (google.protobuf.Empty) {}
 
     rpc GetSurveyReport (GetSurveyReportRequest) returns (GetSurveyReportResponse) {}
 
@@ -82,7 +82,7 @@ message Answer {
     bool t_deleted = 7;
 }
 
-message AnswerVariation {
+message  AnswerVariant {
     int32 id = 1;
     int32 question_id = 2;
     string content = 3;
@@ -175,40 +175,44 @@ message UpdateAnswerRequest {
 
 message GetQuestionAnswersRequest {
     int32 question_id = 1;
+    int32 user_id = 2;
 }
 
 message GetQuestionAnswersResponse {
     repeated Answer answer = 1;
 }
 
-message GetQuestionAnswerVariationsRequest {
+message GetQuestionAnswerVariantsRequest {
     int32 question_id = 1;
 }
 
-message GetQuestionAnswerVariationsResponse {
-    repeated AnswerVariation answer_variation = 1;
+message GetQuestionAnswerVariantsResponse {
+    repeated  AnswerVariant answer_variant = 1;
 }
 
-message UpdateAnswerVariationRequest {
-    int32 answer_variation_id = 1;
+message UpdateAnswerVariantRequest {
+    optional int32 answer_variant_id = 1;
     optional string content = 2;
+    int32 question_id = 3;
 }
 
-message DeleteAnswerVariationRequest {
-    int32 answer_variation_id = 1;
+message DeleteAnswerVariantRequest {
+    int32 answer_variant_id = 1;
 }
 
 message GetSurveyReportRequest {
     int32 survey_id = 1;
 }
 
+message ReportQuestion {
+    Question question = 1;
+    repeated AnswerVariant answer_variants = 2;
+    repeated Answer answers = 3;
+}
 
-// TODO: do it better
 message GetSurveyReportResponse {
     Survey survey = 1;
-    repeated Question questions = 2;
-    repeated AnswerVariation answer_variations = 3;
-    repeated Answer answers = 4;
+    repeated ReportQuestion questions = 2;
 }
 
 message CompleteSurveyRequest {
@@ -217,7 +221,7 @@ message CompleteSurveyRequest {
 }
 
 message ChoosenAnswer {
-    int32 answer_variation_id = 1;
+    int32 answer_variant_id = 1;
     optional int32 priority = 2;
     string content = 3;
 }

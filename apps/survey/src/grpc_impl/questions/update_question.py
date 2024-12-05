@@ -25,6 +25,8 @@ def UpdateQuestion(request, context: ServicerContext):
             if request.type: 
                 question.type = request.type
 
+            question.updated_at = datetime.now()
+
 
             # Сохранение изменений
             session.commit()

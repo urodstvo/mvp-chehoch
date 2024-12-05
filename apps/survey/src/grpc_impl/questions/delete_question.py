@@ -1,3 +1,4 @@
+from datetime import datetime
 from google.protobuf.empty_pb2 import Empty
 from grpc import ServicerContext, StatusCode
 from config.db import Session
@@ -19,6 +20,7 @@ def DeleteQuestion(request, context: ServicerContext):
 
             # Пометка как удаленного
             question.t_deleted = True
+            question.updated_at = datetime.now()
 
             # Сохранение изменений
             session.commit()
