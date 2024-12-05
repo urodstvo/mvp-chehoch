@@ -8,7 +8,7 @@ from .update import update_user
 from .dto.get_me import UserWithProfile
 
 
-router = APIRouter(prefix="/user")
+router = APIRouter(prefix="/user", tags=["User"])
 router.dependencies = [Depends(check_session)]
 
 router.get("/me", response_model=UserWithProfile)(get_user_from_session)

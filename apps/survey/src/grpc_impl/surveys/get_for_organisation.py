@@ -1,7 +1,7 @@
 from google.protobuf.empty_pb2 import Empty
 from grpc import ServicerContext, StatusCode
 from config.db import Session
-from src.models.surveys import Survey
+from src.models.surveys import File
 import survey_pb2
 
 
@@ -11,7 +11,7 @@ from google.protobuf.wrappers_pb2 import StringValue
 def GetOrganisationSurveys(request, context: ServicerContext):
     try:
         with Session() as session:
-            surveys = session.query(Survey).filter(Survey.organisation_id==request.organisation_id, Survey.t_deleted == False).all()
+            surveys = session.query(File).filter(File.organisation_id==request.organisation_id, File.t_deleted == False).all()
 
             if not surveys:
                 context.set_code(StatusCode.NOT_FOUND)

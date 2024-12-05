@@ -13,7 +13,7 @@ from .delete_from_survey import delete_from_survey
 
 
 
-router = APIRouter(prefix="/answer")
+router = APIRouter(prefix="/answer", tags=["Tag"])
 router.dependencies = [Depends(check_session)]
 
 router.get("/survey/{survey_id}", response_model=List[Tag])(get_survey_tags)

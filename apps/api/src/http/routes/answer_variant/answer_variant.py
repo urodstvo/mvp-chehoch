@@ -9,7 +9,7 @@ from .create import create_answer_variant
 from .update import update_answer_variant
 from .delete import delete_answer_variant
 
-router = APIRouter(prefix="/answer-variant")
+router = APIRouter(prefix="/answer-variant", tags=["Answer Variant"])
 router.dependencies = [Depends(check_session)]
 
 router.post("/")(create_answer_variant)

@@ -25,6 +25,7 @@ service SurveyService {
     rpc DeleteQuestion (DeleteQuestionRequest) returns (google.protobuf.Empty) {}
     rpc GetSurveyQuestions (GetSurveyQuestionsRequest) returns (GetSurveyQuestionsResponse) {}
     rpc CompleteQuestion (CompleteQuestionRequest) returns (google.protobuf.Empty) {}
+    rpc DeleteQuestionImage (DeleteQuestionImageRequest) returns (google.protobuf.Empty) {}
 
     // rpc UpdateAnswer (UpdateAnswerRequest) returns (google.protobuf.Empty) {}
     rpc GetQuestionAnswers (GetQuestionAnswersRequest) returns (GetQuestionAnswersResponse) {}
@@ -35,15 +36,31 @@ service SurveyService {
 
     rpc GetSurveyReport (GetSurveyReportRequest) returns (GetSurveyReportResponse) {}
 
+    rpc CreateFile (CreateFileRequest) returns (CreateFileResponse) {}
+    rpc GetFile (GetFileRequest) returns (GetFileResponse) {}
+    rpc DeleteFile (DeleteFileRequest) returns (google.protobuf.Empty) {}
+
+
     
 }
 
 message Tag {
-    int64 id = 1;
+    int32 id = 1;
     string name = 2;
     google.protobuf.Timestamp t_created_at = 3; 
     google.protobuf.Timestamp t_updated_at = 4; 
     bool t_deleted = 5;
+}
+
+message File {
+    int32 id = 1;
+    string filename	= 2;
+    string mime_type = 3;
+    int64 mem_size = 4;
+    int32 user_id = 5;	
+    google.protobuf.Timestamp t_created_at = 6; 
+    google.protobuf.Timestamp t_updated_at = 7; 
+    bool t_deleted = 8;
 }
 
 message Survey {
@@ -68,6 +85,7 @@ message Question {
     google.protobuf.Timestamp t_created_at = 6;
     google.protobuf.Timestamp t_updated_at = 7;
     bool t_deleted = 8;
+    google.protobuf.Int32Value image = 9;
 }
 
 message Answer {
@@ -148,12 +166,14 @@ message CreateQuestionRequest {
     int32 survey_id = 1;
     string content = 2;
     int32 type = 3;
+    optional int32 file_id = 4;
 }
 
 message UpdateQuestionRequest {
     int32 question_id = 1;
     optional string content = 2;
     optional int32 type = 3;
+    optional int32 file_id = 4;
 }
 
 message DeleteQuestionRequest {
@@ -242,4 +262,31 @@ message GetSurveyTagsRequest {
 
 message GetSurveyTagsResponse {
     repeated Tag tags = 1;
+}
+
+message CreateFileRequest {
+    string filename	= 1;
+    string mime_type = 2;
+    int64 mem_size = 3;
+    int32 user_id = 4;	
+}
+
+message CreateFileResponse {
+    int32 file_id = 1;
+}
+
+message DeleteFileRequest {
+    int32 file_id = 1;
+}
+
+message GetFileRequest {
+    int32 file_id = 1;
+}
+
+message GetFileResponse {
+    File file = 1;
+}
+
+message DeleteQuestionImageRequest {
+    int32 question_id = 1;
 }

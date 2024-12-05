@@ -16,7 +16,7 @@ from .get_completed import get_completed_surveys
 
 from .get_report import get_survey_report
 
-router = APIRouter(prefix="/survey")
+router = APIRouter(prefix="/survey", tags=["Survey"])
 router.dependencies = [Depends(check_session)]
 
 router.post("/")(create_survey)

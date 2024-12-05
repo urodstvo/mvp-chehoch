@@ -4,6 +4,7 @@ from src.grpc_impl.tags import *
 from src.grpc_impl.questions import *
 from src.grpc_impl.answers import *
 from src.grpc_impl.answer_variants import *
+from src.grpc_impl.files import *
 
 
 class SurveyService(survey_pb2_grpc.SurveyServiceServicer):
@@ -71,3 +72,15 @@ class SurveyService(survey_pb2_grpc.SurveyServiceServicer):
     
     def GetSurveyReport(self, request, context):
         return GetSurveyReport(request, context)
+
+    def GetFile(self, request, context):
+        return GetFile(request, context)
+    
+    def CreateFile(self, request, context):
+        return CreateFile(request, context)
+    
+    def DeleteFile(self, request, context):
+        return DeleteFile(request, context)
+    
+    def DeleteQuestionImage(self, request, context):
+        return DeleteQuestionImage(request, context)

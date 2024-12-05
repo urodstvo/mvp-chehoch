@@ -17,7 +17,7 @@ func (h *Organisation) UpdateOrganisation(ctx context.Context, req *proto.Update
 	var org models.Organisation
 
 	err := getOrgQuery.RunWith(h.DB).QueryRowContext(ctx).Scan(&org.Id, &org.Supervisor, &org.Name, &org.Email, &org.Phone, &org.Address, &org.WebSite, &org.INN,
-		&org.TCreatedAt, &org.TUpdatedAt, &org.TDeleted)
+		&org.TCreatedAt, &org.TUpdatedAt, &org.TDeleted, &org.Logo)
 	if err != nil {
 		h.Logger.Error("Error while getting organisation")
 		return nil, err
@@ -41,6 +41,9 @@ func (h *Organisation) UpdateOrganisation(ctx context.Context, req *proto.Update
 	if req.WebSite != nil {
 		org.WebSite = sql.NullString{String: *req.WebSite, Valid: true}
 	}
+	if req.Logo != nil {
+		org.Logo = sql.NullInt64{Int64: *req.Logo, Valid: true}
+	}
 
 	updateOrganisationQuery := squirrel.Update(models.Organisation{}.TableName()).SetMap(squirrel.Eq{
 		"t_updated_at": time.Now(),
@@ -50,6 +53,7 @@ func (h *Organisation) UpdateOrganisation(ctx context.Context, req *proto.Update
 		"address":      org.Address,
 		"web_site":     org.WebSite,
 		"inn":          org.INN,
+		"logo":         org.Logo,
 	}).Where(squirrel.Eq{"id": req.OrganisationId, "t_deleted": false}).PlaceholderFormat(squirrel.Dollar)
 	_, err = updateOrganisationQuery.RunWith(h.DB).ExecContext(ctx)
 	if err != nil {

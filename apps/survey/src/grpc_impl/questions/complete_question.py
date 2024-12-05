@@ -3,7 +3,7 @@ from grpc import ServicerContext, StatusCode
 from config.db import Session
 from src.models.answers import Answer
 from src.models.questions import Question
-from src.models.surveys import Survey
+from src.models.surveys import File
 
 
 def CompleteQuestion(request, context: ServicerContext):
@@ -14,8 +14,8 @@ def CompleteQuestion(request, context: ServicerContext):
                     Question.t_deleted == False
                 ).first()
             
-            survey = session.query(Survey).filter(
-                Survey.id==question.survey
+            survey = session.query(File).filter(
+                File.id==question.survey
             ).first()
             
             question.answers_amount += 1

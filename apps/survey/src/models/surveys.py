@@ -6,7 +6,7 @@ from config.db import Base
 
 # from sqlalchemy.ext.declarative import declarative_base
 
-class Survey(Base):
+class File(Base):
     __tablename__ = 'surveys'
     __table_args__ = {'extend_existing': True}
 

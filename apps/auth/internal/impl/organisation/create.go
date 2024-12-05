@@ -10,8 +10,8 @@ import (
 )
 
 func (h *Organisation) CreateOrganisation(ctx context.Context, req *proto.CreateOrganisationRequest) (*emptypb.Empty, error) {
-	createOrgQuery := squirrel.Insert(models.Organisation{}.TableName()).Columns("supervisor", "name", "email", "phone", "address", "web_site", "inn").
-		Values(req.Supervisor, req.Name, req.Email, req.Phone, req.Address, req.WebSite, req.Inn).PlaceholderFormat(squirrel.Dollar)
+	createOrgQuery := squirrel.Insert(models.Organisation{}.TableName()).Columns("supervisor", "name", "email", "phone", "address", "web_site", "inn", "logo").
+		Values(req.Supervisor, req.Name, req.Email, req.Phone, req.Address, req.WebSite, req.Inn, req.Logo).PlaceholderFormat(squirrel.Dollar)
 
 	_, err := createOrgQuery.RunWith(h.DB).ExecContext(ctx)
 	if err != nil {

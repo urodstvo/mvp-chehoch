@@ -1,9 +1,12 @@
 from fastapi import Cookie, HTTPException
-from src.clients import AuthServiceClient
+from src.clients import AuthServiceClient,SurveyServiceClient
+import survey_pb2
 import auth_pb2
 from google.protobuf.empty_pb2 import Empty
 
 from src.models import Organisation
+
+from config.variables import MINIO_URL
 
 
 def get_my_organisations(session_id: str = Cookie(None)):
@@ -13,6 +16,7 @@ def get_my_organisations(session_id: str = Cookie(None)):
 
         res = []
         for organisation in orgs:
+            file = SurveyServiceClient.GetFile(survey_pb2.GetFileRequest(file_id=response.organisation.logo))
             res.append(Organisation(
                 id=organisation.id,
                 name=organisation.name,
@@ -25,6 +29,8 @@ def get_my_organisations(session_id: str = Cookie(None)):
                 t_created_at=Organisation.timestamp_to_datetime(organisation.t_created_at),
                 t_updated_at=Organisation.timestamp_to_datetime(organisation.t_updated_at),
                 t_deleted=organisation.t_deleted,
+                logo=Organisation.int32_value_to_int(organisation.logo),
+                logo_url= f"{MINIO_URL}/chehoch/{file.filename}"
             ))
 
         return res

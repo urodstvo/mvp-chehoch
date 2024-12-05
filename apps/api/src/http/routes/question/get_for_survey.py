@@ -1,3 +1,4 @@
+from config.variables import MINIO_URL
 from src.clients import SurveyServiceClient
 from fastapi import HTTPException
 import survey_pb2
@@ -10,6 +11,7 @@ def get_survey_questions(survey_id: int):
         
         res = []
         for question in response.questions:
+            file = SurveyServiceClient.GetFile(survey_pb2.GetFileRequest(file_id=response.question.image))
             res.append(Question(
                 id=question.id,
                 survey_id=question.survey_id,
@@ -19,6 +21,8 @@ def get_survey_questions(survey_id: int):
                 t_created_at=Question.timestamp_to_datetime(question.t_created_at),
                 t_updated_at=Question.timestamp_to_datetime(question.t_updated_at),
                 t_deleted=question.t_deleted,
+                image=Question.int32_value_to_int(question.image),
+                image_url=f"{MINIO_URL}/chehoch/{file.filename}"
             ))
 
         return res

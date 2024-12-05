@@ -10,7 +10,7 @@ from .delete import delete_organisation
 from src.middleware import check_session
 from src.models import Organisation
 
-router = APIRouter(prefix="/organisation")
+router = APIRouter(prefix="/organisation", tags=["Organisation"])
 router.dependencies = [Depends(check_session)]
 
 router.post("/")(create_organisation)

@@ -50,32 +50,26 @@ func (h *Organisation) GetUserOrganisations(ctx context.Context, req *emptypb.Em
 
 		if org.Email.Valid {
 			wrapper.Email = &wrapperspb.StringValue{Value: org.Email.String}
-		} else {
-			wrapper.Email = nil
 		}
 
 		if org.Phone.Valid {
 			wrapper.Phone = &wrapperspb.StringValue{Value: org.Phone.String}
-		} else {
-			wrapper.Phone = nil
 		}
 
 		if org.Address.Valid {
 			wrapper.Adress = &wrapperspb.StringValue{Value: org.Address.String}
-		} else {
-			wrapper.Adress = nil
 		}
 
 		if org.WebSite.Valid {
 			wrapper.WebSite = &wrapperspb.StringValue{Value: org.WebSite.String}
-		} else {
-			wrapper.WebSite = nil
 		}
 
 		if org.INN.Valid {
 			wrapper.Inn = &wrapperspb.StringValue{Value: org.INN.String}
-		} else {
-			wrapper.Inn = nil
+		}
+
+		if org.Logo.Valid {
+			wrapper.Logo = &wrapperspb.Int64Value{Value: org.Logo.Int64}
 		}
 
 		orgs = append(orgs, wrapper)

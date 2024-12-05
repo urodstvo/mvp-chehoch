@@ -3,14 +3,15 @@ from google.protobuf.empty_pb2 import Empty
 from grpc import ServicerContext, StatusCode
 from config.db import Session
 from sqlalchemy import update
-from src.models.surveys import File 
+from src.models.files import File 
 
-def DeleteSurvey(request, context: ServicerContext):
+def DeleteFile(request, context: ServicerContext):
+    
     try:
         with Session() as session:
             stmt = (
                 update(File)
-                .where(File.id == request.survey_id)
+                .where(File.id == request.file_id)
                 .values(
                     t_deleted=True,
                     t_updated_at=datetime.now()
@@ -22,7 +23,7 @@ def DeleteSurvey(request, context: ServicerContext):
 
             if result.rowcount == 0:
                 context.set_code(StatusCode.NOT_FOUND)
-                context.set_details("Survey not found")
+                context.set_details("File not found")
                 return Empty()
             
     except Exception as e:
