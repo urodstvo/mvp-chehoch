@@ -5,6 +5,7 @@ from src.models import Survey
 from typing import List
 
 from .dto.get_report import GetSurveyReportResponse
+from .dto.get import GetSurveyResponse
 
 from .create import create_survey
 from .update import update_survey
@@ -21,10 +22,10 @@ router = APIRouter(prefix="/survey", tags=["Survey"])
 router.dependencies = [Depends(check_session)]
 
 router.post("/")(create_survey)
-router.get("/completed", response_model=List[Survey])(get_completed_surveys)
-router.get("/feed", response_model=List[Survey])(get_survey_feed)
-router.get("/organisation/{organisation_id}", response_model=List[Survey])(get_organisation_surveys)
-router.get("/{survey_id}", response_model=Survey)(get_survey)
+router.get("/completed", response_model=List[GetSurveyResponse])(get_completed_surveys)
+router.get("/feed", response_model=List[GetSurveyResponse])(get_survey_feed)
+router.get("/organisation/{organisation_id}", response_model=List[GetSurveyResponse])(get_organisation_surveys)
+router.get("/{survey_id}", response_model=GetSurveyResponse)(get_survey)
 router.patch("/{survey_id}")(update_survey)
 router.delete("/{survey_id}")(delete_survey)
 router.post("/complete/{survey_id}")(complete_survey)
