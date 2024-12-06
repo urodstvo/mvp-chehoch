@@ -1,17 +1,13 @@
 from fastapi import Cookie, HTTPException
+import survey_pb2
+from src.clients import SurveyServiceClient, AuthServiceClient
+from google.protobuf.empty_pb2 import Empty
 
 from src.models import Survey
-from .helpers.recomendations import get_survey_recommendations
 
-from src.clients import SurveyServiceClient
-import survey_pb2
-
-
-def get_survey_feed(session_id: str = Cookie(None)):
+def get_organisation_surveys(organisation_id: int):
     try:
-        recs = get_survey_recommendations(session_id)
-        survey_ids = [rec[0] for rec in recs]
-        response = SurveyServiceClient.GetSurveys(survey_pb2.GetSurveysRequest(survey_ids=survey_ids))
+        response = SurveyServiceClient.GetOrganisationSurveys(survey_pb2.GetOrganisationSurveysRequest(organisation_id=organisation_id))
         res = []
 
         for survey in response.survey:
@@ -28,6 +24,7 @@ def get_survey_feed(session_id: str = Cookie(None)):
                 t_deleted=Survey.timestamp_to_datetime(survey.t_deleted),
             ))
 
-            return res
+        return res
+    
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to get survey feed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get completed surveys: {str(e)}")

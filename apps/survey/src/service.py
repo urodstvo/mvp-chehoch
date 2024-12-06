@@ -84,3 +84,6 @@ class SurveyService(survey_pb2_grpc.SurveyServiceServicer):
     
     def DeleteQuestionImage(self, request, context):
         return DeleteQuestionImage(request, context)
+    
+    def GetSurveysWithTagsIds(self, request, context):
+        return GetSurveysWithTagsIds(request, context)

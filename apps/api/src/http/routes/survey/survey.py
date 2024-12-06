@@ -13,6 +13,7 @@ from .get_feed import get_survey_feed
 from .delete import delete_survey
 from .complete import complete_survey
 from .get_completed import get_completed_surveys
+from .get_for_organisation import get_organisation_surveys
 
 from .get_report import get_survey_report
 
@@ -22,6 +23,7 @@ router.dependencies = [Depends(check_session)]
 router.post("/")(create_survey)
 router.get("/completed", response_model=List[Survey])(get_completed_surveys)
 router.get("/feed", response_model=List[Survey])(get_survey_feed)
+router.get("/organisation/{organisation_id}", response_model=List[Survey])(get_organisation_surveys)
 router.get("/{survey_id}", response_model=Survey)(get_survey)
 router.patch("/{survey_id}")(update_survey)
 router.delete("/{survey_id}")(delete_survey)
