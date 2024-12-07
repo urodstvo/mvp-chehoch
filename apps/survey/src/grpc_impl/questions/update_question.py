@@ -25,6 +25,9 @@ def UpdateQuestion(request, context: ServicerContext):
             if request.type: 
                 question.type = request.type
 
+            if request.file_id:
+                question.image = request.file_id
+
             question.updated_at = datetime.now()
 
 

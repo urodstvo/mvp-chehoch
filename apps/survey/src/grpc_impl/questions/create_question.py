@@ -12,7 +12,8 @@ def CreateQuestion(request, context: ServicerContext):
                 survey=request.survey_id,
                 content=request.content,
                 type=request.type,
-                answers_amount=0
+                answers_amount=0,
+                image=request.file_id
             )
 
             # Сохраняем вопрос в базе данных

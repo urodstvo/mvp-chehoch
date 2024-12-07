@@ -37,6 +37,7 @@ def GetSurveyQuestions(request, context: ServicerContext):
                     t_created_at=t_created_at,
                     t_updated_at=t_updated_at,
                     t_deleted=question.t_deleted,
+                    image=Int32Value(value=question.image)
                 ))
 
             return survey_pb2.GetSurveyQuestionsResponse(questions=survey_questions)

@@ -18,6 +18,7 @@ type Organisation struct {
 	TCreatedAt time.Time      `json:"t_created_at"`
 	TUpdatedAt time.Time      `json:"t_updated_at"`
 	TDeleted   bool           `json:"t_deleted"`
+	Logo       sql.NullInt64  `json:"logo"`
 }
 
 func (Organisation) TableName() string {
