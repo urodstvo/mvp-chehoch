@@ -8,6 +8,7 @@ import { Link } from 'react-router';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { usePageTitle } from '@/hooks/use-page-title';
 
 const formSchema = z.object({
     login: z.string(),
@@ -15,6 +16,8 @@ const formSchema = z.object({
 });
 
 export const LoginPage = () => {
+    usePageTitle('Регистрация');
+
     return (
         <PageLayout>
             <PageMiddleColumn className='h-full flex pt-[160px] justify-center'>
