@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { usePageTitle } from '@/hooks/use-page-title';
-import { ConfirmExit } from '@/hooks/use-prompt';
+import { ConfirmExit } from '@/components/ConfirmExit';
 import { cn } from '@/lib/utils';
 import { AnswerVariant, Question, QuestionType } from '@/types';
 import { ArrowRight, BadgeIcon } from 'lucide-react';
@@ -236,7 +236,7 @@ function OneAnswerQuestion({ questionId }: { questionId: number }) {
 
     const { setIsNextQuestionAvailable } = useIsNextQuestionAvailableContext();
     useEffect(() => {
-        if (selected) setIsNextQuestionAvailable(true);
+        if (selected !== null) setIsNextQuestionAvailable(true);
         else setIsNextQuestionAvailable(false);
     }, [selected, setIsNextQuestionAvailable]);
 
@@ -244,7 +244,7 @@ function OneAnswerQuestion({ questionId }: { questionId: number }) {
         <ToggleGroup
             type='single'
             className='grid grid-rows-2 grid-cols-2 w-full gap-x-[60px] gap-y-[32px]'
-            onValueChange={(v) => setSelected(+v || null)}
+            onValueChange={(v) => setSelected(!v ? null : Number(v))}
         >
             {answer_variant.map((answer) => (
                 <ToggleGroupItem
