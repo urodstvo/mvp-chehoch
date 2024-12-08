@@ -26,3 +26,24 @@ export type AnswerVariant = {
     t_deleted: boolean;
     question_id: number;
 };
+
+export type Survey = {
+    id: number;
+    name: string;
+    description: string;
+    questions_amount: number;
+    answers_amount: number;
+    created_by: number;
+    organisation_id: number;
+    t_created_at: Date;
+    t_updated_at: Date;
+    t_deleted: boolean;
+};
+
+export type Tag = {
+    id: number;
+    name: string;
+    t_created_at: Date;
+    t_updated_at: Date;
+    t_deleted: boolean;
+};

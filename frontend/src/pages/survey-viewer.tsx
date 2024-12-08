@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { usePageTitle } from '@/hooks/use-page-title';
+import { ConfirmExit } from '@/hooks/use-prompt';
 import { cn } from '@/lib/utils';
 import { AnswerVariant, Question, QuestionType } from '@/types';
 import { ArrowRight, BadgeIcon } from 'lucide-react';
@@ -73,11 +74,12 @@ export const SurveyViewerPage = () => {
 
 const SurveyViewerPageContent = () => {
     const { currentQuestionNumber } = useCurrentQuestionNumberContext();
+
     const questions = [
         {
             id: 1,
             content: '1',
-            type: QuestionType.ONE_QUESTION,
+            type: 0,
             answers_amount: 0,
             t_created_at: new Date(),
             t_updated_at: new Date(),
@@ -88,7 +90,7 @@ const SurveyViewerPageContent = () => {
         {
             id: 2,
             content: '2',
-            type: QuestionType.MULTI_QUESTION,
+            type: 1,
             answers_amount: 0,
             t_created_at: new Date(),
             t_updated_at: new Date(),
@@ -99,7 +101,7 @@ const SurveyViewerPageContent = () => {
         {
             id: 3,
             content: '3',
-            type: QuestionType.FREE_INPUT,
+            type: 2,
             answers_amount: 0,
             t_created_at: new Date(),
             t_updated_at: new Date(),
@@ -110,7 +112,7 @@ const SurveyViewerPageContent = () => {
         {
             id: 4,
             content: '4',
-            type: QuestionType.SCALE,
+            type: 3,
             answers_amount: 0,
             t_created_at: new Date(),
             t_updated_at: new Date(),
@@ -123,6 +125,12 @@ const SurveyViewerPageContent = () => {
 
     return (
         <>
+            <ConfirmExit
+                when={currentQuestionNumber > 0}
+                action={() => {
+                    sessionStorage.removeItem('currentQuestionNumber');
+                }}
+            />
             <div className='flex gap-1 mt-[24px] mb-2'>
                 {new Array(totalQuestion).fill(0).map((_, index) => (
                     <QuestionMark

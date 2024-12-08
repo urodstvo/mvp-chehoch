@@ -17,20 +17,10 @@ import {
     MenubarTrigger,
 } from '@/components/ui/menubar';
 
-import { Link, NavLink } from 'react-router';
+import { NavLink } from 'react-router';
 
 export const Header = () => {
     const { hasCookie } = useSession();
-    const organisations = [
-        {
-            id: 1,
-            name: 'Организация 1',
-        },
-        {
-            id: 2,
-            name: 'Организация 2',
-        },
-    ];
 
     const user = {
         id: 1,
@@ -44,28 +34,14 @@ export const Header = () => {
                     <NavigationMenu className='w-full'>
                         <NavigationMenuList>
                             <NavigationMenuItem>
-                                <NavLink to='/' className='font-roboto'>
-                                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                                        Лента
-                                    </NavigationMenuLink>
-                                </NavLink>
+                                <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
+                                    <NavLink to='/'>Лента</NavLink>
+                                </NavigationMenuLink>
                             </NavigationMenuItem>
                             <NavigationMenuItem>
-                                <NavigationMenuTrigger>Организации</NavigationMenuTrigger>
-                                <NavigationMenuContent>
-                                    <ul className='grid gap-2 p-4 w-[210px]'>
-                                        {organisations.map((organisation) => (
-                                            <NavigationMenuLink asChild key={organisation.id}>
-                                                <Link
-                                                    to={`/organisations/${organisation.id}`}
-                                                    className='block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground'
-                                                >
-                                                    {organisation.name}
-                                                </Link>
-                                            </NavigationMenuLink>
-                                        ))}
-                                    </ul>
-                                </NavigationMenuContent>
+                                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                                    <NavLink to='/organisations'>Организации</NavLink>
+                                </NavigationMenuLink>
                             </NavigationMenuItem>
                         </NavigationMenuList>
                     </NavigationMenu>

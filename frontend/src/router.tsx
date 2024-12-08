@@ -1,6 +1,6 @@
 import { createBrowserRouter } from 'react-router';
-import { WithAuth, PageLayout } from '@/components/layout';
-import { LoginPage, ProfileHistoryPage, ProfilePage, RegisterPage, SurveyViewerPage } from './pages';
+import { WithAuth } from '@/components/layout';
+import { FeedPage, LoginPage, ProfileHistoryPage, ProfilePage, RegisterPage, SurveyViewerPage } from './pages';
 
 export const router = createBrowserRouter([
     {
@@ -17,7 +17,7 @@ export const router = createBrowserRouter([
         children: [
             {
                 index: true,
-                element: <PageLayout></PageLayout>,
+                element: <FeedPage />,
             },
             {
                 path: '/profile',
