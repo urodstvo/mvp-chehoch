@@ -63,3 +63,22 @@ export type Organisation = {
     logo: number | null;
     logo_url: string | null;
 };
+
+export type Answer = {
+    id: number;
+    answer_variant_id: number;
+    content: string;
+    question_id: number;
+    t_created_at: Date;
+    t_updated_at: Date;
+    t_deleted: boolean;
+};
+
+export type SurveyReport = {
+    survey: Survey;
+    questions: {
+        question: Question;
+        answers: Answer[];
+        answer_variants: AnswerVariant[];
+    }[];
+};

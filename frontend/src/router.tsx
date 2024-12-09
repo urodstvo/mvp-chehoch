@@ -9,6 +9,7 @@ import {
     ProfilePage,
     RegisterPage,
     SurveyEditorPage,
+    SurveyReportPage,
     SurveyViewerPage,
 } from '@/pages';
 
@@ -61,6 +62,7 @@ export const router = createBrowserRouter([
                     },
                     {
                         path: '/survey/:surveyId/report',
+                        element: <SurveyReportPage />,
                     },
                     {
                         path: '/survey/:surveyId/edit',

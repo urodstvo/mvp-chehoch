@@ -7,3 +7,4 @@ export * from './feed';
 export * from './organisations';
 export * from './organisation-feed';
 export * from './survey-editor';
+export * from './survey-report';
