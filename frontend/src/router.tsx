@@ -1,6 +1,16 @@
 import { createBrowserRouter } from 'react-router';
 import { WithAuth } from '@/components/layout';
-import { FeedPage, LoginPage, ProfileHistoryPage, ProfilePage, RegisterPage, SurveyViewerPage } from './pages';
+import {
+    FeedPage,
+    LoginPage,
+    OrganisationFeedPage,
+    OrganisationsPage,
+    ProfileHistoryPage,
+    ProfilePage,
+    RegisterPage,
+    SurveyEditorPage,
+    SurveyViewerPage,
+} from '@/pages';
 
 export const router = createBrowserRouter([
     {
@@ -34,9 +44,11 @@ export const router = createBrowserRouter([
             },
             {
                 path: '/organisations',
+                element: <OrganisationsPage />,
                 children: [
                     {
                         path: '/organisations/:organisationId',
+                        element: <OrganisationFeedPage />,
                     },
                 ],
             },
@@ -52,6 +64,7 @@ export const router = createBrowserRouter([
                     },
                     {
                         path: '/survey/:surveyId/edit',
+                        element: <SurveyEditorPage />,
                     },
                 ],
             },

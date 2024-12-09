@@ -11,6 +11,7 @@ export type Question = {
     content: string;
     type: QuestionType;
     answers_amount: number;
+    survey_id: number;
     t_created_at: Date;
     t_updated_at: Date;
     t_deleted: boolean;
@@ -46,4 +47,19 @@ export type Tag = {
     t_created_at: Date;
     t_updated_at: Date;
     t_deleted: boolean;
+};
+
+export type Organisation = {
+    id: number;
+    name: string;
+    email: string | null;
+    phone: string | null;
+    address: string | null;
+    web_site: string | null;
+    inn: string | null;
+    t_created_at: Date;
+    t_updated_at: Date;
+    t_deleted: boolean;
+    logo: number | null;
+    logo_url: string | null;
 };

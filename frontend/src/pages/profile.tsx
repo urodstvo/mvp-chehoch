@@ -6,18 +6,25 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { usePageTitle } from '@/hooks/use-page-title';
-import { PencilIcon } from 'lucide-react';
+import { CalendarIcon, PencilIcon } from 'lucide-react';
 import { NavLink } from 'react-router';
+import { format } from 'date-fns';
+
+import { Calendar } from '@/components/ui/calendar';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useState } from 'react';
+import { Tag } from '@/types';
+
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 
 export const ProfilePage = () => {
     usePageTitle('Профиль');
 
-    const tags = [];
+    const tags: Tag[] = [];
     return (
         <PageLayout>
             <PageMiddleColumn>
@@ -132,11 +139,33 @@ function ProfileForm() {
                     control={form.control}
                     name='birdthDate'
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className='flex flex-col w-full'>
                             <FormLabel>Дата рождения</FormLabel>
-                            <FormControl>
-                                <Input type='date' {...field} disabled={disabled} />
-                            </FormControl>
+                            <Popover>
+                                <PopoverTrigger asChild disabled={disabled}>
+                                    <FormControl>
+                                        <Button
+                                            variant={'outline'}
+                                            className={cn(
+                                                'w-full pl-3 text-left font-normal',
+                                                !field.value && 'text-muted-foreground'
+                                            )}
+                                        >
+                                            {field.value ? format(field.value, 'PPP') : <span>Выберите дату</span>}
+                                            <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                                        </Button>
+                                    </FormControl>
+                                </PopoverTrigger>
+                                <PopoverContent className='w-auto p-0' align='start'>
+                                    <Calendar
+                                        mode='single'
+                                        selected={field.value}
+                                        onSelect={field.onChange}
+                                        disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
+                                        initialFocus
+                                    />
+                                </PopoverContent>
+                            </Popover>
                         </FormItem>
                     )}
                 />
