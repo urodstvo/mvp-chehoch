@@ -18,9 +18,7 @@ def GetSurveyTags(request, context: ServicerContext):
             ).all()
 
             if not tags:
-                context.set_code(StatusCode.NOT_FOUND)
-                context.set_details(f"No tags found for survey ID {request.survey_id}")
-                return Empty()
+                return survey_pb2.GetSurveyTagsResponse(tags=[])
             
             survey_tags = []
             for _, tag in tags:

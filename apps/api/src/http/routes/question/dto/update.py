@@ -1,8 +1,8 @@
-from fastapi import UploadFile
+from fastapi import Form, UploadFile
 from pydantic import BaseModel
 from typing import Optional
 
 class UpdateQuestionRequest(BaseModel):
-    content: Optional[str] = None
-    type: Optional[int] = None
-    image: Optional[UploadFile] = None
+    content: Optional[str] = Form(None)
+    type: Optional[int] = Form(None)
+    image: Optional[UploadFile] = Form(None)

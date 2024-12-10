@@ -1,7 +1,7 @@
 from google.protobuf.empty_pb2 import Empty
 from grpc import ServicerContext, StatusCode
 from config.db import Session
-from src.models.surveys import File
+from src.models.surveys import Survey
 import survey_pb2 
 from config.logger import logger
 
@@ -17,12 +17,10 @@ def GetSurveys(request: survey_pb2.GetSurveysRequest, context: ServicerContext):
             return Empty()  
 
         with Session() as session:
-            surveys = session.query(File).filter(File.id.in_(survey_ids), File.t_deleted == False).all()
+            surveys = session.query(Survey).filter(Survey.id.in_(survey_ids), Survey.t_deleted == False).all()
 
             if not surveys:
-                context.set_code(StatusCode.NOT_FOUND)
-                context.set_details("Surveys not found")
-                return Empty()
+                survey_pb2.GetSurveysResponse(survey=[])
             
             res = []
             for survey in surveys:

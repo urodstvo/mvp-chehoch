@@ -2,7 +2,7 @@ from google.protobuf.empty_pb2 import Empty
 from grpc import ServicerContext, StatusCode
 from config.db import Session
 from src.models.users_surveys import UserSurvey 
-from src.models.surveys import File
+from src.models.surveys import Survey
 from sqlalchemy import update
 from datetime import datetime
 
@@ -13,7 +13,7 @@ def CompleteSurvey(request, context: ServicerContext):
                 user_id=request.user_id,
                 survey_id=request.survey_id
             ))
-            stmt = update(File).where(File.id == request.survey_id).values(t_updated_at=datetime.now(), answers_amount=File.answers_amount + 1)
+            stmt = update(Survey).where(Survey.id == request.survey_id).values(t_updated_at=datetime.now(), answers_amount=Survey.answers_amount + 1)
             session.execute(stmt)
             session.commit()
     except Exception as e:

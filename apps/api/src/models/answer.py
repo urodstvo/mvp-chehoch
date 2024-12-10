@@ -1,7 +1,10 @@
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
-from google.protobuf.wrappers_pb2 import Int32Value
+from google.protobuf.wrappers_pb2 import StringValue, Int32Value, Int64Value
+
+
+from google.protobuf.timestamp_pb2 import Timestamp
 
 
 class Answer(BaseModel):
@@ -21,3 +24,13 @@ class Answer(BaseModel):
     @staticmethod
     def int32_value_to_int(value: Optional[Int32Value]) -> Optional[int]:
         return value.value if value else None
+
+
+    @staticmethod
+    def string_value_to_str(value: Optional[StringValue]) -> Optional[str]:
+        return value.value if value else None
+    
+        
+    @staticmethod
+    def timestamp_to_datetime(value: Optional[Timestamp]) -> Optional[datetime]:
+        return value.ToDatetime() if value else None

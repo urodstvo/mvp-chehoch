@@ -1,3 +1,4 @@
+import json
 import uvicorn
 from fastapi import FastAPI, Depends
 from starlette.middleware.cors import CORSMiddleware
@@ -33,6 +34,25 @@ app.include_router(user_router)
 
 if __name__ == "__main__":
     bucket_name = "chehoch"
-    if not MinioClient.bucket_exists(bucket_name): MinioClient.make_bucket(bucket_name)
+    if not MinioClient.bucket_exists(bucket_name): 
+        MinioClient.make_bucket(bucket_name)
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {"AWS": "*"},
+                    "Action": ["s3:GetBucketLocation", "s3:ListBucket"],
+                    "Resource": f"arn:aws:s3:::{bucket_name}",
+                },
+                {
+                    "Effect": "Allow",
+                    "Principal": {"AWS": "*"},
+                    "Action": "s3:GetObject",
+                    "Resource":  f"arn:aws:s3:::{bucket_name}/*",
+                },
+            ],
+        }
+        MinioClient.set_bucket_policy(bucket_name, json.dumps(policy))
 
     uvicorn.run("server:app", host="0.0.0.0", port=8000)

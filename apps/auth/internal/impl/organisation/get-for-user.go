@@ -32,8 +32,8 @@ func (h *Organisation) GetUserOrganisations(ctx context.Context, req *emptypb.Em
 
 	for rows.Next() {
 		var org models.Organisation
-		err = rows.Scan(&org.Id, &org.Supervisor, &org.Name, &org.Email, &org.Phone, &org.Address, &org.WebSite, &org.INN,
-			&org.TCreatedAt, &org.TUpdatedAt, &org.TDeleted)
+		err = rows.Scan(&org.Id, &org.Name, &org.Supervisor, &org.Email, &org.Phone, &org.Address, &org.WebSite, &org.INN, &org.IsVerified,
+			&org.TCreatedAt, &org.TUpdatedAt, &org.TDeleted, &org.Logo)
 		if err != nil {
 			h.Logger.Error("Error while scaning organisations")
 			return nil, err

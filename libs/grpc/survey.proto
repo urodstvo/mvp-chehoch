@@ -41,6 +41,7 @@ service SurveyService {
     rpc DeleteFile (DeleteFileRequest) returns (google.protobuf.Empty) {}
 
     rpc GetSurveysWithTagsIds (google.protobuf.Empty) returns (GetSurveysWithTagsIdsResponse) {}
+    rpc GetAllTags (google.protobuf.Empty) returns (GetAllTagsResponse) {}
 }
 
 message Tag {
@@ -163,9 +164,7 @@ message DeleteTagsFromSurveyRequest {
 
 message CreateQuestionRequest {
     int32 survey_id = 1;
-    string content = 2;
-    int32 type = 3;
-    optional int32 file_id = 4;
+    int32 type = 2;
 }
 
 message UpdateQuestionRequest {
@@ -240,7 +239,7 @@ message CompleteSurveyRequest {
 }
 
 message ChoosenAnswer {
-    int32 answer_variant_id = 1;
+    optional int32 answer_variant_id = 1;
     optional int32 priority = 2;
     string content = 3;
 }
@@ -297,4 +296,8 @@ message SurveyWithTagId {
 
 message GetSurveysWithTagsIdsResponse {
     repeated SurveyWithTagId survey_with_tag_ids = 1;
+}
+
+message GetAllTagsResponse {
+    repeated Tag tags = 1;
 }

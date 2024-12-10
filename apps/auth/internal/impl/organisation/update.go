@@ -16,7 +16,7 @@ func (h *Organisation) UpdateOrganisation(ctx context.Context, req *proto.Update
 
 	var org models.Organisation
 
-	err := getOrgQuery.RunWith(h.DB).QueryRowContext(ctx).Scan(&org.Id, &org.Supervisor, &org.Name, &org.Email, &org.Phone, &org.Address, &org.WebSite, &org.INN,
+	err := getOrgQuery.RunWith(h.DB).QueryRowContext(ctx).Scan(&org.Id, &org.Name, &org.Supervisor, &org.Email, &org.Phone, &org.Address, &org.WebSite, &org.INN, &org.IsVerified,
 		&org.TCreatedAt, &org.TUpdatedAt, &org.TDeleted, &org.Logo)
 	if err != nil {
 		h.Logger.Error("Error while getting organisation")
@@ -49,7 +49,7 @@ func (h *Organisation) UpdateOrganisation(ctx context.Context, req *proto.Update
 		"t_updated_at": time.Now(),
 		"name":         org.Name,
 		"email":        org.Email,
-		"phone":        org.Phone,
+		"phone_number": org.Phone,
 		"address":      org.Address,
 		"web_site":     org.WebSite,
 		"inn":          org.INN,

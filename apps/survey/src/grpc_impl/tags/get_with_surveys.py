@@ -23,7 +23,7 @@ def GetSurveysWithTagsIds(request, context: ServicerContext):
             for tag in tags:
                 res.append(survey_pb2.SurveyWithTagId(survey_id=tag.survey_id, tag_id=tag.tag_id))
 
-            return survey_pb2.GetSurveysWithTagsIdsResponse(survey_with_tag_ids=tags)
+            return survey_pb2.GetSurveysWithTagsIdsResponse(survey_with_tag_ids=res)
 
     except Exception as e:
         context.set_code(StatusCode.INTERNAL)

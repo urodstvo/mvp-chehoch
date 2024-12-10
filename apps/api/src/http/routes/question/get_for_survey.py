@@ -8,11 +8,10 @@ from src.models import Question
 def get_survey_questions(survey_id: int):
     try:
         response: survey_pb2.GetSurveyQuestionsResponse = SurveyServiceClient.GetSurveyQuestions(survey_pb2.GetSurveyQuestionsRequest(survey_id=survey_id))
-        
         res = []
+        
         for question in response.questions:
-            file = SurveyServiceClient.GetFile(survey_pb2.GetFileRequest(file_id=response.question.image))
-            res.append(Question(
+            question = Question(
                 id=question.id,
                 survey_id=question.survey_id,
                 type=Question.string_value_to_str(question.type),
@@ -22,8 +21,12 @@ def get_survey_questions(survey_id: int):
                 t_updated_at=Question.timestamp_to_datetime(question.t_updated_at),
                 t_deleted=question.t_deleted,
                 image=Question.int32_value_to_int(question.image),
-                image_url=f"{MINIO_URL}/chehoch/{file.filename}"
-            ))
+            )
+
+            if question.image:
+                file = SurveyServiceClient.GetFile(survey_pb2.GetFileRequest(file_id=question.image))
+                question.image_url = f"http://{MINIO_URL}/chehoch/{file.file.filename}"
+            res.append(question)
 
         return res
     except Exception as e:

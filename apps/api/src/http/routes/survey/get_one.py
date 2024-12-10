@@ -21,7 +21,7 @@ def get_survey(survey_id: int):
                     organisation_id=survey.organisation_id,
                     t_created_at=Survey.timestamp_to_datetime(survey.t_created_at),
                     t_updated_at=Survey.timestamp_to_datetime(survey.t_updated_at),
-                    t_deleted=Survey.timestamp_to_datetime(survey.t_deleted),
+                    t_deleted=survey.t_deleted,
                 ),
                 tags=[
                     Tag(

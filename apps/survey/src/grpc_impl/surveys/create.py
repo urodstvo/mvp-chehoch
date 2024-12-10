@@ -1,13 +1,13 @@
 from google.protobuf.empty_pb2 import Empty
 from grpc import ServicerContext, StatusCode
 from config.db import Session
-from src.models.surveys import File 
+from src.models.surveys import Survey 
 from config.logger import logger
 
 def CreateSurvey(request, context: ServicerContext):
     try:
         with Session() as session:
-            new_survey = File(
+            new_survey = Survey(
                 created_by=request.created_by,
                 organisation_id=request.organisation_id
             )
