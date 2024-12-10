@@ -4,41 +4,49 @@ import { useParams } from 'react-router';
 import { Survey, Tag } from '@/types';
 import { OrganisationSurveyCard } from '@/components';
 import { Button } from '@/components/ui/button';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { api } from '@/api';
 
 export const OrganisationFeedPage = () => {
     const { organisationId } = useParams();
     usePageTitle(`Опросы организации ${organisationId}`);
-    const surveys: {
-        survey: Survey;
-        tags: Tag[];
-    }[] = [
-        {
-            survey: {
-                id: 1,
-                name: 'Опрос организации',
-                description: 'Описание опроса',
-                questions_amount: 1,
-                answers_amount: 1,
-                created_by: 1,
-                organisation_id: 1,
-                t_created_at: new Date(),
-                t_updated_at: new Date(),
-                t_deleted: false,
-            },
-            tags: [],
+
+    const queryClient = useQueryClient();
+
+    const { data } = useQuery({
+        queryKey: ['survey', 'organisation', organisationId],
+        queryFn: () =>
+            api.get<
+                {
+                    survey: Survey;
+                    tags: Tag[];
+                }[]
+            >(`/survey/organisation/${organisationId}`),
+    });
+    const { mutate } = useMutation({
+        mutationFn: () => api.post('/survey', { organisation_id: organisationId }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['survey', 'organisation', organisationId],
+                exact: true,
+            });
         },
-    ];
+    });
 
     return (
         <>
             <div className='flex justify-end w-full mb-[32px]'>
-                <Button>Создать опрос</Button>
+                <Button onClick={() => mutate()}>Создать опрос</Button>
             </div>
-            <div>
-                {surveys.map((survey) => (
-                    <OrganisationSurveyCard key={survey.survey.id} survey={survey.survey} tags={survey.tags} />
-                ))}
-                {surveys.length === 0 && <h4 className='text-center text-muted-foreground'>Опросы не найдены</h4>}
+            <div className='flex flex-col gap-4'>
+                {data &&
+                    data.data.map((survey) => (
+                        <OrganisationSurveyCard key={survey.survey.id} survey={survey.survey} tags={survey.tags} />
+                    ))}
+                {!data ||
+                    (data.data.length === 0 && (
+                        <h4 className='text-center text-muted-foreground'>Опросы не найдены</h4>
+                    ))}
             </div>
         </>
     );

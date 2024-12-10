@@ -3,12 +3,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, Form, FormDescription } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { usePageTitle } from '@/hooks/use-page-title';
+
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { api } from '@/api';
+
+import { toast } from 'sonner';
 
 export const RegisterPage = () => {
     usePageTitle('Регистрация');
@@ -59,6 +64,37 @@ const formSchema = z
     });
 
 function RegisterForm() {
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
+
+    const { mutate, isPending } = useMutation({
+        mutationFn: ({ login, email, password }: z.infer<typeof formSchema>) => {
+            return api.post(
+                '/auth/register',
+                {
+                    login,
+                    email,
+                    password,
+                },
+                {
+                    headers: {
+                        'Aplication-Type': 'application/json',
+                    },
+                }
+            );
+        },
+        onSuccess: () => {
+            toast('Вы успешно зарегистрировались и вошли в аккаунт');
+            queryClient.removeQueries();
+            navigate('/');
+        },
+        onError: () => {
+            toast.error('Произошла ошибка при регистрации', {
+                description: 'Возможно такой пользователь уже существует',
+            });
+        },
+    });
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
     });
@@ -74,7 +110,7 @@ function RegisterForm() {
                 <Form {...form}>
                     <form
                         onSubmit={form.handleSubmit((data) => {
-                            console.log(data);
+                            mutate(data);
                         })}
                         className='grid gap-4'
                     >
@@ -131,7 +167,7 @@ function RegisterForm() {
                                 </FormItem>
                             )}
                         />
-                        <Button type='submit' className='w-full' disabled={!form.formState.isValid}>
+                        <Button type='submit' className='w-full' disabled={!form.formState.isValid || isPending}>
                             Создать аккаунт
                         </Button>
                     </form>

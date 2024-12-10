@@ -2,7 +2,7 @@ import { PageLayout, PageMiddleColumn, PageRightColumn } from '@/components/layo
 import { Badge, badgeVariants } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { usePageTitle } from '@/hooks/use-page-title';
@@ -16,13 +16,17 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { createContext, Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
-import { Tag } from '@/types';
+import { Profile, Tag, User } from '@/types';
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DialogTrigger } from '@radix-ui/react-dialog';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { api } from '@/api';
+import { toast } from 'sonner';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type isEditingFormContextProps = {
     isEditing: boolean;
@@ -55,30 +59,50 @@ export const ProfilePage = () => {
     );
 };
 
-const date = new Date();
-
 function ProfileTags() {
-    const [tags, setTags] = useState<Tag[]>([
-        {
-            id: 1,
-            name: 'React',
-            t_created_at: date,
-            t_updated_at: date,
-            t_deleted: false,
-        },
-    ]);
+    const queryClient = useQueryClient();
+    const { data, isPending } = useQuery({
+        queryKey: ['profile', 'tags'],
+        queryFn: () => api.get<Tag[]>('/tag/user'),
+    });
 
-    const data = {
-        tags: [
-            {
-                id: 1,
-                name: 'React',
-                t_created_at: date,
-                t_updated_at: date,
-                t_deleted: false,
-            },
-        ],
-    };
+    const { mutate: addTags } = useMutation({
+        mutationFn: (data: { tags: number[] }) => api.post('/tag/user', data),
+        onSuccess: () => {
+            toast('Изменения успешно внесены');
+            queryClient.invalidateQueries({
+                queryKey: ['profile', 'tags'],
+                exact: true,
+            });
+        },
+        onError: () => {
+            toast.error('Произошла ошибка при внесении изменений');
+        },
+    });
+
+    const { mutate: deleteTags } = useMutation({
+        mutationFn: (data: { tags: number[] }) =>
+            api.delete('/tag/user', {
+                data,
+            }),
+        onSuccess: () => {
+            toast('Изменения успешно внесены');
+            queryClient.invalidateQueries({
+                queryKey: ['profile', 'tags'],
+                exact: true,
+            });
+        },
+        onError: () => {
+            toast.error('Произошла ошибка при внесении изменений');
+        },
+    });
+
+    const [tags, setTags] = useState<Tag[]>([]);
+
+    useEffect(() => {
+        if (data) setTags(data.data);
+    }, [data]);
+
     return (
         <PageRightColumn className='flex justify-end'>
             <Card className='w-[300px] h-fit mt-[100px]'>
@@ -102,27 +126,37 @@ function ProfileTags() {
                             </DialogHeader>
                             <TagsCombobox currentTags={tags} setCurrentTags={setTags} />
                             <div className='flex flex-wrap items-center gap-x-2'>
-                                {tags.map((tag) => (
-                                    <div className={cn(badgeVariants(), 'w-fit gap-2 items-center')} key={tag.id}>
-                                        {tag.name}
-                                        <Button
-                                            size={null}
-                                            variant={null}
-                                            onClick={() => setTags((prev) => prev.filter((t) => t.id !== tag.id))}
-                                            className='rounded-full'
-                                        >
-                                            <XIcon />
-                                        </Button>
-                                    </div>
-                                ))}
+                                {isPending &&
+                                    new Array(5)
+                                        .fill(0)
+                                        .map((_, ind) => <Skeleton key={ind} className={badgeVariants()} />)}
+                                {!isPending &&
+                                    tags.map((tag) => (
+                                        <div className={cn(badgeVariants(), 'w-fit gap-2 items-center')} key={tag.id}>
+                                            {tag.name}
+                                            <Button
+                                                size={null}
+                                                variant={null}
+                                                onClick={() => setTags((prev) => prev.filter((t) => t.id !== tag.id))}
+                                                className='rounded-full'
+                                            >
+                                                <XIcon />
+                                            </Button>
+                                        </div>
+                                    ))}
                             </div>
-                            {JSON.stringify(tags) !== JSON.stringify(data.tags) && (
+                            {data && JSON.stringify(tags) !== JSON.stringify(data.data) && (
                                 <Button
                                     onClick={() => {
-                                        const deleted = data.tags.filter((tag) => !tags.find((t) => t.id === tag.id));
-                                        const added = tags.filter((tag) => !data.tags.find((t) => t.id === tag.id));
-                                        console.log('@tags modal deleted:', deleted);
-                                        console.log('@tags modal added:', added);
+                                        const deleted = data.data
+                                            .filter((tag) => !tags.find((t) => t.id === tag.id))
+                                            .map((el) => el.id);
+                                        const added = tags
+                                            .filter((tag) => !data.data.find((t) => t.id === tag.id))
+                                            .map((el) => el.id);
+
+                                        if (deleted.length > 0) deleteTags({ tags: deleted });
+                                        if (added.length > 0) addTags({ tags: added });
                                     }}
                                 >
                                     Сохранить
@@ -132,7 +166,7 @@ function ProfileTags() {
                     </Dialog>
                 </CardHeader>
                 <CardContent className='mt-2'>
-                    {data.tags.map((tag) => (
+                    {data?.data.map((tag) => (
                         <Badge key={tag.id}>{tag.name}</Badge>
                     ))}
                 </CardContent>
@@ -149,44 +183,10 @@ export function TagsCombobox({
     setCurrentTags: Dispatch<SetStateAction<Tag[]>>;
 }) {
     const [open, setOpen] = useState(false);
-
-    const tags: Tag[] = [
-        {
-            id: 1,
-            name: 'React',
-            t_created_at: date,
-            t_updated_at: date,
-            t_deleted: false,
-        },
-        {
-            id: 2,
-            name: 'Vue',
-            t_created_at: date,
-            t_updated_at: date,
-            t_deleted: false,
-        },
-        {
-            id: 3,
-            name: 'Angular',
-            t_created_at: date,
-            t_updated_at: date,
-            t_deleted: false,
-        },
-        {
-            id: 4,
-            name: 'Svelte',
-            t_created_at: date,
-            t_updated_at: date,
-            t_deleted: false,
-        },
-        {
-            id: 5,
-            name: 'Next.js',
-            t_created_at: date,
-            t_updated_at: date,
-            t_deleted: false,
-        },
-    ];
+    const { data } = useQuery({
+        queryKey: ['tags'],
+        queryFn: () => api.get<Tag[]>('/tag/'),
+    });
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -202,7 +202,7 @@ export function TagsCombobox({
                     <CommandList>
                         <CommandEmpty>Теги не найдены.</CommandEmpty>
                         <CommandGroup>
-                            {tags.map((tag) => (
+                            {data?.data.map((tag) => (
                                 <CommandItem
                                     key={tag.id}
                                     value={tag.id.toString()}
@@ -210,7 +210,7 @@ export function TagsCombobox({
                                         setCurrentTags((prev) =>
                                             prev.some((v) => v.id === Number(currentValue))
                                                 ? prev
-                                                : [tags.find((v) => v.id === Number(currentValue))!, ...prev]
+                                                : [data.data.find((v) => v.id === Number(currentValue))!, ...prev]
                                         );
                                     }}
                                 >
@@ -231,8 +231,16 @@ export function TagsCombobox({
     );
 }
 
+type Response = {
+    user: User;
+    profile: Profile;
+};
 function ProfilePageContent() {
     const { setIsEditing } = useIsEditingFormContext();
+    const { data, isPending } = useQuery({
+        queryKey: ['profile', 'info'],
+        queryFn: () => api.get<Response>('/user/me'),
+    });
     return (
         <PageMiddleColumn>
             <Tabs defaultValue='info'>
@@ -259,12 +267,14 @@ function ProfilePageContent() {
                     </Button>
                 </div>
                 <TabsContent value='info' className='mt-[32px]'>
-                    <ProfileForm
-                        login='login'
-                        email='email@test.com'
-                        profession='profession'
-                        birdthDate={new Date(Date.parse('2003-01-09'))}
-                    />
+                    {data && !isPending && (
+                        <ProfileForm
+                            login={data.data.user.login}
+                            email={data.data.user.email}
+                            proffession={data.data.profile.profession}
+                            birdthDate={data.data.profile.birth_date}
+                        />
+                    )}
                 </TabsContent>
             </Tabs>
         </PageMiddleColumn>
@@ -274,39 +284,58 @@ function ProfilePageContent() {
 const formSchema = z.object({
     login: z.string(),
     email: z.string().email(),
-    profession: z.string().min(2),
-    birdthDate: z.preprocess((val) => (typeof val === 'string' ? new Date(val) : val), z.date()),
+    proffession: z.string().nullable().optional(),
+    birth_date: z.date().nullable().optional(),
 });
 
 function ProfileForm({
     login,
     email,
-    profession,
+    proffession,
     birdthDate,
 }: {
     login: string;
     email: string;
-    profession: string;
-    birdthDate: Date;
+    proffession?: string;
+    birdthDate?: Date;
 }) {
-    const { isEditing } = useIsEditingFormContext();
+    const { isEditing, setIsEditing } = useIsEditingFormContext();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             login,
             email,
-            profession,
-            birdthDate,
+            proffession,
+            birth_date: birdthDate,
         },
     });
 
     useEffect(() => {
-        form.resetField('birdthDate');
-        form.resetField('profession');
-        form.resetField('email');
-        form.resetField('login');
+        form.reset({
+            birth_date: birdthDate ? new Date(birdthDate) : null, // Приводим к Date
+            proffession,
+            email,
+            login,
+        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isEditing]);
+
+    const queryClient = useQueryClient();
+
+    const { mutate, isPending } = useMutation({
+        mutationFn: (data: Partial<z.infer<typeof formSchema>>) => api.patch('/user/me', data),
+        onSuccess: () => {
+            toast('Данные успешено изменены');
+            queryClient.resetQueries({
+                queryKey: ['profile', 'info'],
+                exact: true,
+            });
+            setIsEditing(false);
+        },
+        onError: () => {
+            toast('Произошла ошибка при изменение профиля');
+        },
+    });
 
     return (
         <Form {...form}>
@@ -315,11 +344,16 @@ function ProfileForm({
                     const changedData = Object.keys(form.formState.dirtyFields).reduce<
                         Partial<z.infer<typeof formSchema>>
                     >((acc, key) => {
-                        // @ts-expect-error any
-                        acc[key] = data[key];
+                        if (key === 'birth_date' && data[key]) {
+                            const date = new Date(data[key] as Date);
+                            date.setHours(date.getHours() + 3); // Прибавляем 3 часа
+                            acc[key] = date.toISOString(); // Отправляем в формате ISO
+                        } else {
+                            acc[key] = data[key];
+                        }
                         return acc;
                     }, {});
-                    console.log(changedData);
+                    mutate(changedData);
                 })}
                 className='grid gap-4'
             >
@@ -332,6 +366,7 @@ function ProfileForm({
                             <FormControl>
                                 <Input {...field} disabled={!isEditing} />
                             </FormControl>
+                            <FormMessage />
                         </FormItem>
                     )}
                 />
@@ -344,24 +379,26 @@ function ProfileForm({
                             <FormControl>
                                 <Input {...field} disabled={!isEditing} />
                             </FormControl>
+                            <FormMessage />
                         </FormItem>
                     )}
                 />
                 <FormField
                     control={form.control}
-                    name='profession'
+                    name='proffession'
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Профессия</FormLabel>
                             <FormControl>
                                 <Input {...field} disabled={!isEditing} />
                             </FormControl>
+                            <FormMessage />
                         </FormItem>
                     )}
                 />
                 <FormField
                     control={form.control}
-                    name='birdthDate'
+                    name='birth_date'
                     render={({ field }) => (
                         <FormItem className='flex flex-col w-full'>
                             <FormLabel>Дата рождения</FormLabel>
@@ -375,7 +412,7 @@ function ProfileForm({
                                                 !field.value && 'text-muted-foreground'
                                             )}
                                         >
-                                            {field.value ? format(field.value, 'PPP') : <span>Выберите дату</span>}
+                                            {field.value ? format(field.value, 'PPP') : <span>Дата рождения</span>}
                                             <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
                                         </Button>
                                     </FormControl>
@@ -386,14 +423,14 @@ function ProfileForm({
                                         selected={field.value}
                                         onSelect={field.onChange}
                                         disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
-                                        initialFocus
                                     />
                                 </PopoverContent>
                             </Popover>
+                            <FormMessage />
                         </FormItem>
                     )}
                 />
-                {form.formState.isDirty && <Button>Сохранить</Button>}
+                {form.formState.isDirty && <Button disabled={isPending}>Сохранить</Button>}
             </form>
         </Form>
     );

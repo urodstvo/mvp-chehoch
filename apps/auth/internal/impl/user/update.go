@@ -2,12 +2,14 @@ package user
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/urodstvo/mvp-chehoch/apps/auth/internal/helpers"
 	"github.com/urodstvo/mvp-chehoch/apps/auth/internal/models"
 	proto "github.com/urodstvo/mvp-chehoch/libs/grpc/__generated__"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -29,7 +31,7 @@ func (h *User) UpdateUser(ctx context.Context, req *proto.UpdateUserRequest) (*e
 
 	var user models.User
 	var profile models.Profile
-	err = getUserQuery.RunWith(tx).QueryRowContext(ctx).Scan(&user.Id, &user.Login, &user.Password, &user.Email, &user.TCreatedAt, &user.TUpdatedAt, &user.TDeleted, &profile.Id, &profile.Proffession, &profile.BirthDate, &profile.MaritalStatus, &profile.EducationLevel)
+	err = getUserQuery.RunWith(tx).QueryRowContext(ctx).Scan(&user.Id, &user.Login, &user.Password, &user.Email, &user.TCreatedAt, &user.TUpdatedAt, &user.TDeleted, &profile.Id, &profile.Proffession, &profile.BirthDate, &profile.MaritalStatus, &profile.EducationLevel, &profile.Avatar)
 	if err != nil {
 		h.Logger.Error("Error while getting user")
 		return nil, err
@@ -49,7 +51,8 @@ func (h *User) UpdateUser(ctx context.Context, req *proto.UpdateUserRequest) (*e
 	var MaritalStatus *int32
 
 	if req.BirthDate != nil {
-		*BirthDate = req.BirthDate.AsTime()
+		time := req.BirthDate.AsTime()
+		BirthDate = &time
 	} else {
 		if profile.BirthDate.Valid {
 			BirthDate = &profile.BirthDate.Time
@@ -92,15 +95,26 @@ func (h *User) UpdateUser(ctx context.Context, req *proto.UpdateUserRequest) (*e
 	}
 
 	updateProfileQuery := squirrel.Update(models.Profile{}.TableName()).SetMap(squirrel.Eq{
-		"proffession":     Proffession,
+		"profession":      Proffession,
 		"birth_date":      BirthDate,
 		"marital_status":  MaritalStatus,
 		"education_level": EducationLevel,
-		"t_updated_at":    time.Now(),
-	}).Where(squirrel.Eq{"id": u.Id, "t_deleted": false}).PlaceholderFormat(squirrel.Dollar)
+	}).Where(squirrel.Eq{"id": u.Id}).PlaceholderFormat(squirrel.Dollar)
 	_, err = updateProfileQuery.RunWith(tx).ExecContext(ctx)
 	if err != nil {
 		h.Logger.Error("Error while updating profile")
+		return nil, err
+	}
+
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, fmt.Errorf("Empty metadata")
+	}
+
+	// Обновляем данные в Redis
+	err = h.Redis.HSet(ctx, "session:"+md["session_id"][0], user).Err()
+	if err != nil {
+		h.Logger.Error("Error while updating session in Redis", "error", err)
 		return nil, err
 	}
 

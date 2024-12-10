@@ -6,7 +6,6 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/urodstvo/mvp-chehoch/apps/auth/internal/models"
 	proto "github.com/urodstvo/mvp-chehoch/libs/grpc/__generated__"
-	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
@@ -24,7 +23,7 @@ func (h *User) GetUsers(ctx context.Context, req *proto.GetUsersRequest) (*proto
 	for rows.Next() {
 		var user models.User
 		var profile models.Profile
-		err = rows.Scan(&user.Id, &user.Login, &user.Password, &user.Email, &user.TCreatedAt, &user.TUpdatedAt, &user.TDeleted, &profile.Id, &profile.Proffession, &profile.BirthDate, &profile.MaritalStatus, &profile.EducationLevel)
+		err = rows.Scan(&user.Id, &user.Login, &user.Password, &user.Email, &user.TCreatedAt, &user.TUpdatedAt, &user.TDeleted, &profile.Id, &profile.Proffession, &profile.BirthDate, &profile.MaritalStatus, &profile.EducationLevel, &profile.Avatar)
 		if err != nil {
 			h.Logger.Error("Error while scaning users")
 			return nil, err
@@ -47,17 +46,17 @@ func (h *User) GetUsers(ctx context.Context, req *proto.GetUsersRequest) (*proto
 			wrapper.BirthDate = timestamppb.New(profile.BirthDate.Time)
 		}
 
-		if profile.EducationLevel.Valid {
-			wrapper.EducationLevel = &proto.UserWithProfile_Level{Level: proto.EducationLevel(profile.EducationLevel.Int32)}
-		} else {
-			wrapper.EducationLevel = &proto.UserWithProfile_NoLevel{NoLevel: &emptypb.Empty{}}
-		}
+		// if profile.EducationLevel.Valid {
+		// 	wrapper.EducationLevel = &proto.UserWithProfile_Level{Level: proto.EducationLevel(profile.EducationLevel.Int32)}
+		// } else {
+		// 	wrapper.EducationLevel = &proto.UserWithProfile_NoLevel{NoLevel: &emptypb.Empty{}}
+		// }
 
-		if profile.MaritalStatus.Valid {
-			wrapper.MaritalStatus = &proto.UserWithProfile_Status{Status: proto.MaritalStatus(profile.MaritalStatus.Int32)}
-		} else {
-			wrapper.MaritalStatus = &proto.UserWithProfile_NoStatus{NoStatus: &emptypb.Empty{}}
-		}
+		// if profile.MaritalStatus.Valid {
+		// 	wrapper.MaritalStatus = &proto.UserWithProfile_Status{Status: proto.MaritalStatus(profile.MaritalStatus.Int32)}
+		// } else {
+		// 	wrapper.MaritalStatus = &proto.UserWithProfile_NoStatus{NoStatus: &emptypb.Empty{}}
+		// }
 
 		users = append(users, &wrapper)
 	}

@@ -15,7 +15,7 @@ def get_organisation_surveys(organisation_id: int):
 
             res.append(GetSurveyResponse(
                 survey=Survey(
-                    id=response.survey.id,
+                    id=survey.id,
                     name=Survey.string_value_to_str(survey.name),
                     description=Survey.string_value_to_str(survey.description),
                     questions_amount=survey.questions_amount,
@@ -24,7 +24,7 @@ def get_organisation_surveys(organisation_id: int):
                     organisation_id=survey.organisation_id,
                     t_created_at=Survey.timestamp_to_datetime(survey.t_created_at),
                     t_updated_at=Survey.timestamp_to_datetime(survey.t_updated_at),
-                    t_deleted=Survey.timestamp_to_datetime(survey.t_deleted),
+                    t_deleted=survey.t_deleted,
                 ),
                 tags=[
                     Tag(

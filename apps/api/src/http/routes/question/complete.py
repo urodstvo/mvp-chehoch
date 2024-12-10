@@ -9,7 +9,7 @@ def complete_question(data: CompleteQuestionRequest, question_id: int, session_i
     try:
         response = AuthServiceClient.GetUserFromSession(Empty(), metadata=(("session_id", session_id),))
         
-        request = survey_pb2.CompleteQuestionRequest(question_id=data.question_id, user_id=response.id, answers = [
+        request = survey_pb2.CompleteQuestionRequest(question_id=question_id, user_id=response.user.id, answers = [
             survey_pb2.ChoosenAnswer(**answer.model_dump()) for answer in data.answers ])
         SurveyServiceClient.CompleteQuestion(request)
     except Exception as e:

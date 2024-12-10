@@ -22,6 +22,7 @@ type Profile struct {
 	BirthDate      sql.NullTime   `json:"birth_date"`
 	MaritalStatus  sql.NullInt32  `json:"marital_status"`
 	EducationLevel sql.NullInt32  `json:"education_level"`
+	Avatar         sql.NullInt32  `json:"avatar"`
 }
 
 func (Profile) TableName() string {

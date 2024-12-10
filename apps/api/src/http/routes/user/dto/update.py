@@ -7,7 +7,7 @@ from datetime import datetime
 class UpdateUserRequest(BaseModel):
     login: Optional[str] = None
     email: Optional[EmailStr] = None
-    profession: Optional[str] = None
+    proffession: Optional[str] = None
     birth_date: Optional[datetime] = None
     marital_status: Optional[str] = None
     education_level: Optional[str] = None

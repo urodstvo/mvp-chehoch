@@ -20,12 +20,12 @@ func (h *Session) GetUserFromSession(ctx context.Context, _ *emptypb.Empty) (*pr
 		return nil, err
 	}
 
-	h.Logger.Info("Get user from session", slog.Any("user", user))
+	// h.Logger.Info("Get user from session", slog.Any("user", user))
 
 	getProfileQuery := squirrel.Select("*").From(models.Profile{}.TableName()).Where(squirrel.Eq{"id": user.Id}).PlaceholderFormat(squirrel.Dollar)
 
 	var profile models.Profile
-	err = getProfileQuery.RunWith(h.DB).QueryRowContext(ctx).Scan(&profile.Id, &profile.Proffession, &profile.BirthDate, &profile.MaritalStatus, &profile.EducationLevel)
+	err = getProfileQuery.RunWith(h.DB).QueryRowContext(ctx).Scan(&profile.Id, &profile.Proffession, &profile.BirthDate, &profile.MaritalStatus, &profile.EducationLevel, &profile.Avatar)
 	if err != nil {
 		h.Logger.Error("Error while getting profile")
 		return nil, err
@@ -48,19 +48,17 @@ func (h *Session) GetUserFromSession(ctx context.Context, _ *emptypb.Empty) (*pr
 		wrapper.BirthDate = timestamppb.New(profile.BirthDate.Time)
 	}
 
-	if profile.EducationLevel.Valid {
-		wrapper.EducationLevel = &proto.UserWithProfile_Level{Level: proto.EducationLevel(profile.EducationLevel.Int32)}
-	} else {
-		wrapper.EducationLevel = &proto.UserWithProfile_NoLevel{NoLevel: &emptypb.Empty{}}
-	}
+	// if profile.EducationLevel.Valid {
+	// 	wrapper.EducationLevel = &proto.UserWithProfile_Level{Level: proto.EducationLevel(profile.EducationLevel.Int32)}
+	// } else {
+	// 	wrapper.EducationLevel = &proto.UserWithProfile_NoLevel{NoLevel: &emptypb.Empty{}}
+	// }
 
-	if profile.MaritalStatus.Valid {
-		wrapper.MaritalStatus = &proto.UserWithProfile_Status{Status: proto.MaritalStatus(profile.MaritalStatus.Int32)}
-	} else {
-		wrapper.MaritalStatus = &proto.UserWithProfile_NoStatus{NoStatus: &emptypb.Empty{}}
-	}
-
-	h.Logger.Info("wrapper", slog.Any("w", wrapper))
+	// if profile.MaritalStatus.Valid {
+	// 	wrapper.MaritalStatus = &proto.UserWithProfile_Status{Status: proto.MaritalStatus(profile.MaritalStatus.Int32)}
+	// } else {
+	// 	wrapper.MaritalStatus = &proto.UserWithProfile_NoStatus{NoStatus: &emptypb.Empty{}}
+	// }
 
 	return &proto.GetUserFromSessionResponse{User: wrapper}, nil
 }

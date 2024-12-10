@@ -3,15 +3,20 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, Form } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { usePageTitle } from '@/hooks/use-page-title';
 
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { api } from '@/api';
+
+import { toast } from 'sonner';
+
 export const LoginPage = () => {
-    usePageTitle('Регистрация');
+    usePageTitle('Авторизация');
 
     return (
         <PageLayout>
@@ -40,8 +45,28 @@ const formSchema = z.object({
 });
 
 function LoginForm() {
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
+    });
+
+    const { mutate, isPending } = useMutation({
+        mutationFn: (data: z.infer<typeof formSchema>) =>
+            api.post<z.infer<typeof formSchema>>('/auth/login', data, {
+                headers: {
+                    'Aplication-Type': 'application/json',
+                },
+            }),
+        onSuccess: () => {
+            toast('Вы успешно вошли в аккаунт');
+            navigate('/');
+            queryClient.removeQueries();
+        },
+        onError: () => {
+            toast.error('Неправильный логин или пароль');
+        },
     });
 
     return (
@@ -55,7 +80,7 @@ function LoginForm() {
                 <Form {...form}>
                     <form
                         onSubmit={form.handleSubmit((data) => {
-                            console.log(data);
+                            mutate(data);
                         })}
                         className='grid gap-4'
                     >
@@ -85,7 +110,7 @@ function LoginForm() {
                                 </FormItem>
                             )}
                         />
-                        <Button type='submit' className='w-full' disabled={!form.formState.isValid}>
+                        <Button type='submit' className='w-full' disabled={!form.formState.isValid || isPending}>
                             Войти
                         </Button>
                     </form>

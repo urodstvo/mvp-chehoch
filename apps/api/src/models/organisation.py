@@ -2,13 +2,13 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
 from google.protobuf.timestamp_pb2 import Timestamp
-from google.protobuf.wrappers_pb2 import StringValue, Int32Value
+from google.protobuf.wrappers_pb2 import StringValue, Int32Value, Int64Value
 
 class Organisation(BaseModel):
     id: int
     name: str
     supervisor: int
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None
     phone: Optional[str] = None
     address: Optional[str] = None
     web_site: Optional[str] = None
@@ -29,6 +29,9 @@ class Organisation(BaseModel):
     
     @staticmethod
     def int32_value_to_int(value: Optional[Int32Value]) -> Optional[int]:
+        return value.value if value else None
+    @staticmethod
+    def int64_value_to_int(value: Optional[Int64Value]) -> Optional[int]:
         return value.value if value else None
 
 

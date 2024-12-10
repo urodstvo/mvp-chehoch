@@ -15,7 +15,7 @@ func (h *Organisation) GetOrganisation(ctx context.Context, req *proto.GetOrgani
 
 	var org models.Organisation
 
-	err := getOrganisationQuery.RunWith(h.DB).QueryRowContext(ctx).Scan(&org.Id, &org.Supervisor, &org.Name, &org.Email, &org.Phone, &org.Address, &org.WebSite, &org.INN,
+	err := getOrganisationQuery.RunWith(h.DB).QueryRowContext(ctx).Scan(&org.Id, &org.Name, &org.Supervisor, &org.Email, &org.Phone, &org.Address, &org.WebSite, &org.INN, &org.IsVerified,
 		&org.TCreatedAt, &org.TUpdatedAt, &org.TDeleted, &org.Logo)
 	if err != nil {
 		h.Logger.Error("Error while getting organisation")

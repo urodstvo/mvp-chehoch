@@ -7,8 +7,8 @@ import auth_pb2
 from src.session import set_session_cookie
 
 def login(data: LoginRequest, response: Response):
-    response = AuthServiceClient.Login(auth_pb2.LoginRequest(login=data.login, password=data.password))
+    res = AuthServiceClient.Login(auth_pb2.LoginRequest(login=data.login, password=data.password))
 
-    set_session_cookie(response, response.session_id)
+    set_session_cookie(response, res.session_id)
 
     return

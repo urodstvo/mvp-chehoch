@@ -17,9 +17,7 @@ def GetQuestionAnswerVariants(request, context: ServicerContext):
             ).all()
 
             if not answer_variants:
-                context.set_code(StatusCode.NOT_FOUND)
-                context.set_details(f"No answer variants found for question ID {request.question_id}")
-                return Empty()
+               return survey_pb2.GetQuestionAnswerVariantsResponse(answer_variant=[])
 
             question_answers = []
             for answer in answer_variants:

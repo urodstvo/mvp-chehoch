@@ -19,13 +19,13 @@ def UpdateQuestion(request, context: ServicerContext):
                 return Empty()
 
             # Обновление данных вопроса
-            if request.content:
+            if "content" in request:
                 question.content = request.content
             
-            if request.type: 
+            if "type" in request: 
                 question.type = request.type
 
-            if request.file_id:
+            if "file_id" in request:
                 question.image = request.file_id
 
             question.updated_at = datetime.now()

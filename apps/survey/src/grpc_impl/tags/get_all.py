@@ -6,38 +6,31 @@ from src.models.survey_tags import SurveyTag
 from src.models.tags import Tag
 import survey_pb2
 
-def GetSurveyTags(request, context: ServicerContext):
+def GetAllTags(request, context: ServicerContext):
     try:
         with Session() as session:
-            tags = session.query(SurveyTag, Tag).join(
-                Tag, Tag.id == SurveyTag.tag_id
-            ).filter(
-                SurveyTag.survey_id == request.survey_id,
-                SurveyTag.t_deleted == False,
-                Tag.t_deleted == False
-            ).all()
+            tags = session.query(Tag).filter(Tag.t_deleted == False).all()
 
             if not tags:
-                return survey_pb2.GetSurveyTagsResponse(tags=[])
+                return survey_pb2.GetAllTagsResponse(tags=[])
             
-            survey_tags = []
-            for _, tag in tags:
+            res = []
+            for tag in tags:
                 t_created_at = Timestamp()
                 t_created_at.FromDatetime(tag.t_created_at)
                 t_updated_at = Timestamp()
                 t_updated_at.FromDatetime(tag.t_updated_at)
                 
-                survey_tags.append( survey_pb2.Tag(
+                res.append(survey_pb2.Tag(
                     id=tag.id,
                     name=tag.name,
                     t_created_at=t_created_at,
                     t_updated_at=t_updated_at,
                     t_deleted=tag.t_deleted,
-                    )
-                )
+                ))
                 
 
-            return survey_pb2.GetSurveyTagsResponse(tags=survey_tags)
+            return survey_pb2.GetAllTagsResponse(tags=res)
 
     except Exception as e:
         context.set_code(StatusCode.INTERNAL)

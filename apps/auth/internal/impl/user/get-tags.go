@@ -17,17 +17,24 @@ func (h *User) GetUserTags(ctx context.Context, req *emptypb.Empty) (*proto.GetU
 		h.Logger.Error("Error while getting user")
 		return nil, err
 	}
-	getUserTagsQuery := squirrel.Select("*").From(models.ProfilesTags{}.TableName() + " pt").Join(models.Tag{}.TableName() + " t ON t.id = pt.tag_id").
-		Where(squirrel.Eq{"profile_id": user.Id, "t_deleted": false}).PlaceholderFormat(squirrel.Dollar)
-	var tags []models.Tag
+	getUserTagsQuery := squirrel.Select("t.*").From(models.ProfilesTags{}.TableName() + " pt").Join(models.Tag{}.TableName() + " t ON t.id = pt.tag_id").
+		Where(squirrel.Eq{"pt.profile_id": user.Id, "t.t_deleted": false, "pt.t_deleted": false}).PlaceholderFormat(squirrel.Dollar)
 
-	err = getUserTagsQuery.RunWith(h.DB).QueryRowContext(ctx).Scan(&tags)
+	var wrapper []*proto.Tag
+
+	rows, err := getUserTagsQuery.RunWith(h.DB).QueryContext(ctx)
 	if err != nil {
 		h.Logger.Error("Error while getting user tags")
 		return nil, err
 	}
-	wrapper := make([]*proto.Tag, 0, len(tags))
-	for _, tag := range tags {
+
+	for rows.Next() {
+		var tag models.Tag
+		err = rows.Scan(&tag.Id, &tag.Name, &tag.TCreatedAt, &tag.TUpdatedAt, &tag.TDeleted)
+		if err != nil {
+			h.Logger.Error("Error while scaning tag")
+			return nil, err
+		}
 		wrapper = append(wrapper, &proto.Tag{
 			Id:         tag.Id,
 			Name:       tag.Name,

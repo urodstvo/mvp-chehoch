@@ -2,7 +2,7 @@
 from google.protobuf.empty_pb2 import Empty
 from grpc import ServicerContext, StatusCode
 from config.db import Session
-from src.models.surveys import File 
+from src.models.surveys import Survey 
 from src.models.questions import Question 
 from src.models.answer_variants import AnswerVariant 
 from src.models.answers import Answer 
@@ -15,9 +15,9 @@ import survey_pb2
 def GetSurveyReport(request, context: ServicerContext):
     try:
         with Session() as session:
-            survey = session.query(File).filter(
-                File.id == request.survey_id, 
-                File.t_deleted == False
+            survey = session.query(Survey).filter(
+                Survey.id == request.survey_id, 
+                Survey.t_deleted == False
             ).first()
             if survey is None:
                 context.set_code(StatusCode.NOT_FOUND)
@@ -25,7 +25,8 @@ def GetSurveyReport(request, context: ServicerContext):
                 return Empty()
             
             questions = session.query(Question).filter(
-                Question.survey == request.survey_id
+                Question.survey == request.survey_id,
+                Question.t_deleted == False
             ).all()
 
             survey_questions = []

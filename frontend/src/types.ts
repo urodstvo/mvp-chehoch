@@ -9,11 +9,11 @@ export enum QuestionType {
 export type Question = {
     id: number;
     content: string;
-    type: QuestionType;
+    type: string;
     answers_amount: number;
     survey_id: number;
-    t_created_at: Date;
-    t_updated_at: Date;
+    t_created_at: string;
+    t_updated_at: string;
     t_deleted: boolean;
     image: number | null;
     image_url: string | null;
@@ -68,6 +68,7 @@ export type Answer = {
     id: number;
     answer_variant_id: number;
     content: string;
+    priority?: number;
     question_id: number;
     t_created_at: Date;
     t_updated_at: Date;
@@ -81,4 +82,21 @@ export type SurveyReport = {
         answers: Answer[];
         answer_variants: AnswerVariant[];
     }[];
+};
+
+export type User = {
+    id: number;
+    login: string;
+    email: string;
+    t_created_at: Date;
+    t_updated_at: Date;
+    t_deleted: boolean;
+};
+
+export type Profile = {
+    user_id: number;
+    profession: string;
+    birth_date: Date;
+    education_level: string;
+    marital_status: string;
 };

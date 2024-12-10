@@ -18,9 +18,7 @@ def GetQuestionAnswers(request, context: ServicerContext):
             ).all()
 
             if not answers:
-                context.set_code(StatusCode.NOT_FOUND)
-                context.set_details(f"No answers found for question ID {request.question_id}")
-                return Empty()
+                return survey_pb2.GetQuestionAnswersResponse(answer=[])
 
             question_answers = []
             for answer in answers:

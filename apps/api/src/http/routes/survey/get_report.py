@@ -1,4 +1,5 @@
 from typing import List
+from config.variables import MINIO_URL
 import survey_pb2
 from fastapi import HTTPException
 
@@ -24,11 +25,13 @@ def get_survey_report(survey_id: int):
                     t_created_at=Question.timestamp_to_datetime(question.question.t_created_at),
                     t_updated_at=Question.timestamp_to_datetime(question.question.t_updated_at),
                     t_deleted=question.question.t_deleted,
+                    image=None,
+                    image_url=None
                 ),
                 answer_variants=[AnswerVariant(
                     id=answer_variant.id,
                     question_id=answer_variant.question_id,
-                    content=AnswerVariant.string_value_to_str(answer_variant.content),
+                    content=answer_variant.content,
                     t_created_at=AnswerVariant.timestamp_to_datetime(answer_variant.t_created_at),
                     t_updated_at=AnswerVariant.timestamp_to_datetime(answer_variant.t_updated_at),
                     t_deleted=answer_variant.t_deleted,
@@ -38,7 +41,7 @@ def get_survey_report(survey_id: int):
                     question_id=answer.question_id,
                     user_id=answer.user_id,
                     answer_variant_id=answer.answer_variant_id,
-                    content=Answer.string_value_to_str(answer.content),
+                    content=answer.content,
                     priority=Answer.int32_value_to_int(answer.priority),
                     t_created_at=Answer.timestamp_to_datetime(answer.t_created_at),
                     t_updated_at=Answer.timestamp_to_datetime(answer.t_updated_at),
@@ -57,7 +60,7 @@ def get_survey_report(survey_id: int):
                 organisation_id=response.survey.organisation_id,
                 t_created_at=Survey.timestamp_to_datetime(response.survey.t_created_at),
                 t_updated_at=Survey.timestamp_to_datetime(response.survey.t_updated_at),
-                t_deleted=Survey.timestamp_to_datetime(response.survey.t_deleted),
+                t_deleted=response.survey.t_deleted,
             ),
             questions=res
         )

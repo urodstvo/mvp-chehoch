@@ -13,7 +13,7 @@ export const SurveyCard = ({ survey, tags }: { survey: Survey; tags: Tag[] }) =>
             </CardHeader>
             <CardContent className='flex flex-col gap-4'>
                 {tags.length > 0 && (
-                    <div>
+                    <div className='flex flex-wrap gap-2 items-center'>
                         {tags.map((t) => (
                             <Badge key={t.id}>{t.name}</Badge>
                         ))}
@@ -48,7 +48,7 @@ export const OrganisationSurveyCard = ({ survey, tags }: { survey: Survey; tags:
             </CardHeader>
             <CardContent className='flex flex-col gap-4'>
                 {tags.length > 0 && (
-                    <div>
+                    <div className='flex flex-wrap gap-2 items-center'>
                         {tags.map((t) => (
                             <Badge key={t.id}>{t.name}</Badge>
                         ))}

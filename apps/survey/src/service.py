@@ -87,3 +87,6 @@ class SurveyService(survey_pb2_grpc.SurveyServiceServicer):
     
     def GetSurveysWithTagsIds(self, request, context):
         return GetSurveysWithTagsIds(request, context)
+    
+    def GetAllTags(self, request, context):
+        return GetAllTags(request, context)

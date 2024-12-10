@@ -3,7 +3,7 @@ from grpc import ServicerContext, StatusCode
 from config.db import Session
 from src.models.answers import Answer
 from src.models.questions import Question
-from src.models.surveys import File
+from src.models.surveys import Survey
 
 
 def CompleteQuestion(request, context: ServicerContext):
@@ -14,8 +14,13 @@ def CompleteQuestion(request, context: ServicerContext):
                     Question.t_deleted == False
                 ).first()
             
-            survey = session.query(File).filter(
-                File.id==question.survey
+            if not question:
+                context.set_code(StatusCode.NOT_FOUND)
+                context.set_details("Question not found")
+                return Empty()
+
+            survey = session.query(Survey).filter(
+                Survey.id==question.survey
             ).first()
             
             question.answers_amount += 1
@@ -27,10 +32,14 @@ def CompleteQuestion(request, context: ServicerContext):
                 answer = Answer(
                     question_id=request.question_id,
                     created_by=request.user_id,
-                    answer_variant_id=v.answer_variant_id,
-                    priority=v.priority,
                     content=v.content
                 )
+
+                if "answer_variant_id" in v:
+                    answer.answer_variant_id=v.answer_variant_id
+
+                if "priority" in v:
+                    answer.priority=v.priority,
 
                 user_answers.append(answer)
 

@@ -15,9 +15,25 @@ import {
     MenubarTrigger,
 } from '@/components/ui/menubar';
 
-import { NavLink } from 'react-router';
+import { NavLink, useNavigate } from 'react-router';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { api } from '@/api';
+import { toast } from 'sonner';
 
 export const Header = () => {
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
+    const { mutate, isPending } = useMutation({
+        mutationFn: () => api.post('/auth/logout'),
+        onError: () => {
+            toast.error('Произошла ошибка при выходе');
+        },
+        onSuccess: () => {
+            toast('Вы успешно вышли из аккаунта');
+            queryClient.removeQueries();
+            navigate(0);
+        },
+    });
     const { hasCookie } = useSession();
 
     const user = {
@@ -66,7 +82,9 @@ export const Header = () => {
                                     <MenubarItem>Профиль</MenubarItem>
                                 </NavLink>
                                 <MenubarSeparator />
-                                <MenubarItem>Выйти из аккаунта</MenubarItem>
+                                <MenubarItem disabled={isPending} onClick={() => mutate()}>
+                                    Выйти из аккаунта
+                                </MenubarItem>
                             </MenubarContent>
                         </MenubarMenu>
                     </Menubar>

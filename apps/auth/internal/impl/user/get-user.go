@@ -6,7 +6,6 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/urodstvo/mvp-chehoch/apps/auth/internal/models"
 	proto "github.com/urodstvo/mvp-chehoch/libs/grpc/__generated__"
-	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
@@ -24,7 +23,7 @@ func (h *User) GetUser(ctx context.Context, req *proto.GetUserRequest) (*proto.G
 	getProfileQuery := squirrel.Select("*").From(models.Profile{}.TableName()).Where(squirrel.Eq{"id": user.Id}).PlaceholderFormat(squirrel.Dollar)
 
 	var profile models.Profile
-	err = getProfileQuery.RunWith(h.DB).QueryRowContext(ctx).Scan(&profile.Id, &profile.Proffession, &profile.BirthDate, &profile.MaritalStatus, &profile.EducationLevel)
+	err = getProfileQuery.RunWith(h.DB).QueryRowContext(ctx).Scan(&profile.Id, &profile.Proffession, &profile.BirthDate, &profile.MaritalStatus, &profile.EducationLevel, &profile.Avatar)
 	if err != nil {
 		h.Logger.Error("Error while getting profile")
 		return nil, err
@@ -47,17 +46,17 @@ func (h *User) GetUser(ctx context.Context, req *proto.GetUserRequest) (*proto.G
 		wrapper.BirthDate = timestamppb.New(profile.BirthDate.Time)
 	}
 
-	if profile.EducationLevel.Valid {
-		wrapper.EducationLevel = &proto.UserWithProfile_Level{Level: proto.EducationLevel(profile.EducationLevel.Int32)}
-	} else {
-		wrapper.EducationLevel = &proto.UserWithProfile_NoLevel{NoLevel: &emptypb.Empty{}}
-	}
+	// if profile.EducationLevel.Valid {
+	// 	wrapper.EducationLevel = &proto.UserWithProfile_Level{Level: proto.EducationLevel(profile.EducationLevel.Int32)}
+	// } else {
+	// 	wrapper.EducationLevel = &proto.UserWithProfile_NoLevel{NoLevel: &emptypb.Empty{}}
+	// }
 
-	if profile.MaritalStatus.Valid {
-		wrapper.MaritalStatus = &proto.UserWithProfile_Status{Status: proto.MaritalStatus(profile.MaritalStatus.Int32)}
-	} else {
-		wrapper.MaritalStatus = &proto.UserWithProfile_NoStatus{NoStatus: &emptypb.Empty{}}
-	}
+	// if profile.MaritalStatus.Valid {
+	// 	wrapper.MaritalStatus = &proto.UserWithProfile_Status{Status: proto.MaritalStatus(profile.MaritalStatus.Int32)}
+	// } else {
+	// 	wrapper.MaritalStatus = &proto.UserWithProfile_NoStatus{NoStatus: &emptypb.Empty{}}
+	// }
 
 	return &proto.GetUserResponse{User: &wrapper}, nil
 

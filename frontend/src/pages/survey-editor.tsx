@@ -1,7 +1,7 @@
 import { PageLayout, PageLeftColumn, PageMiddleColumn, PageRightColumn } from '@/components/layout';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, Form } from '@/components/ui/form';
 import { usePageTitle } from '@/hooks/use-page-title';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -11,7 +11,7 @@ import { useForm } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { AnswerVariant, Question, QuestionType, Tag } from '@/types';
+import { AnswerVariant, Question, QuestionType, Survey, Tag } from '@/types';
 import { Badge, badgeVariants } from '@/components/ui/badge';
 import { Check, ChevronsUpDown, PencilIcon, PlusIcon, TrashIcon, XIcon } from 'lucide-react';
 import { DialogHeader } from '@/components/ui/dialog';
@@ -22,57 +22,69 @@ import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, Command
 import { useState, Dispatch, SetStateAction, useEffect } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { api } from '@/api';
+import { toast } from 'sonner';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export const SurveyEditorPage = () => {
     const { surveyId } = useParams();
     usePageTitle(`Редактирование опроса ${surveyId}`);
 
+    const { data, isFetching, isError } = useQuery({
+        queryKey: ['survey', surveyId],
+        queryFn: () =>
+            api.get<{
+                survey: Survey;
+                tags: Tag[];
+            }>(`/survey/${surveyId}`),
+        staleTime: 0,
+    });
+
+    const navigate = useNavigate();
+
+    const queryClient = useQueryClient();
+    const { mutate, isPending } = useMutation({
+        mutationFn: (organisation_id: string) => api.delete(`/survey/${surveyId}`),
+        onSuccess: (_, v) => {
+            toast('Опрос успешно удален');
+            queryClient.invalidateQueries({
+                queryKey: ['survey', 'organisation', v],
+                exact: true,
+            });
+            navigate(`/organisations/${v}`);
+        },
+    });
+
+    useEffect(() => {
+        if (isError) {
+            navigate(-1);
+            toast.error('Не удалось загрузить данные опроса');
+        }
+    }, [isError, navigate]);
+
     return (
         <PageLayout>
             <PageLeftColumn>
-                <div className='flex justify-start mt-[320px]'>
-                    <Card className='w-[300px] h-fit'>
-                        {/* <CardHeader className='flex justify-between flex-row'></CardHeader> */}
-                        <CardContent className='mt-2 pt-4'>
-                            <div
-                                role='button'
-                                className='px-2 py-1 hover:bg-[#E4E4E7] hover:bg-opacity-50 group flex justify-between items-center rounded'
-                            >
-                                Свободный ввод
-                                <PlusIcon strokeWidth={1} className='hidden group-hover:block' size={16} />
-                            </div>
-                            <div
-                                role='button'
-                                className='px-2 py-1 hover:bg-[#E4E4E7] hover:bg-opacity-50 group flex justify-between items-center rounded'
-                            >
-                                Один вариант
-                                <PlusIcon strokeWidth={1} className='hidden group-hover:block' size={16} />
-                            </div>
-                            <div
-                                role='button'
-                                className='px-2 py-1 hover:bg-[#E4E4E7] hover:bg-opacity-50 group flex justify-between items-center rounded'
-                            >
-                                Несколько вариантов
-                                <PlusIcon strokeWidth={1} className='hidden group-hover:block' size={16} />
-                            </div>
-                            <div
-                                role='button'
-                                className='px-2 py-1 hover:bg-[#E4E4E7] hover:bg-opacity-50 group flex justify-between items-center rounded'
-                            >
-                                Шкала (от 1 до 5)
-                                <PlusIcon strokeWidth={1} className='hidden group-hover:block' size={16} />
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
+                <QuestionCreator />
             </PageLeftColumn>
             <PageMiddleColumn>
-                <div className='flex justify-end'>
-                    <Button variant='secondary' className='border'>
-                        Удалить опрос
-                    </Button>
-                </div>
-                <EditorForm />
+                {data && !isFetching && (
+                    <>
+                        <div className='flex justify-end'>
+                            <Button
+                                variant='secondary'
+                                className='border'
+                                onClick={() => mutate(data.data.survey.organisation_id.toString())}
+                                disabled={isPending}
+                            >
+                                Удалить опрос
+                            </Button>
+                        </div>
+                        <EditorForm name={data.data.survey.name} description={data.data.survey.description} />
+                    </>
+                )}
+                {!data && isFetching && <div>Загрузка...</div>}
                 <QuestionsList />
             </PageMiddleColumn>
             <SurveyTags />
@@ -80,18 +92,106 @@ export const SurveyEditorPage = () => {
     );
 };
 
+function QuestionCreator() {
+    const { surveyId } = useParams();
+    const queryClient = useQueryClient();
+    const { mutate } = useMutation({
+        mutationFn: (type: number) =>
+            api.post(`/question`, {
+                survey_id: surveyId,
+                type,
+            }),
+        onSuccess: () => {
+            toast('Вопрос успешно добавлен');
+            queryClient.invalidateQueries({
+                queryKey: ['survey', 'questions', surveyId],
+                exact: true,
+            });
+        },
+        onError: () => {
+            toast.error('Ошибка при создании вопроса');
+        },
+    });
+    return (
+        <div className='flex justify-start mt-[320px]'>
+            <Card className='w-[300px] h-fit'>
+                <CardContent className='mt-2 pt-4'>
+                    <div
+                        role='button'
+                        className='px-2 py-1 hover:bg-[#E4E4E7] hover:bg-opacity-50 group flex justify-between items-center rounded'
+                        onClick={() => mutate(QuestionType.FREE_INPUT)}
+                    >
+                        Свободный ввод
+                        <PlusIcon strokeWidth={1} className='hidden group-hover:block' size={16} />
+                    </div>
+                    <div
+                        role='button'
+                        className='px-2 py-1 hover:bg-[#E4E4E7] hover:bg-opacity-50 group flex justify-between items-center rounded'
+                        onClick={() => mutate(QuestionType.ONE_QUESTION)}
+                    >
+                        Один вариант
+                        <PlusIcon strokeWidth={1} className='hidden group-hover:block' size={16} />
+                    </div>
+                    <div
+                        role='button'
+                        className='px-2 py-1 hover:bg-[#E4E4E7] hover:bg-opacity-50 group flex justify-between items-center rounded'
+                        onClick={() => mutate(QuestionType.MULTI_QUESTION)}
+                    >
+                        Несколько вариантов
+                        <PlusIcon strokeWidth={1} className='hidden group-hover:block' size={16} />
+                    </div>
+                    <div
+                        role='button'
+                        className='px-2 py-1 hover:bg-[#E4E4E7] hover:bg-opacity-50 group flex justify-between items-center rounded'
+                        onClick={() => mutate(QuestionType.SCALE)}
+                    >
+                        Шкала (от 1 до 5)
+                        <PlusIcon strokeWidth={1} className='hidden group-hover:block' size={16} />
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+    );
+}
+
 const formSchema = z.object({
     name: z.string(),
     description: z.string(),
 });
 
-function EditorForm() {
+function EditorForm({ name, description }: { name?: string; description?: string }) {
+    const { surveyId } = useParams();
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
+        defaultValues: { name, description },
+    });
+
+    const { mutate, isPending } = useMutation({
+        mutationFn: (data: Partial<z.infer<typeof formSchema>>) => api.patch(`/survey/${surveyId}`, data),
+        onSuccess: (_, v) => {
+            toast('Данные изменены');
+            form.reset({
+                ...form.getValues(),
+                ...v,
+            });
+        },
+        onError: () => {
+            toast.error('Произошла ошибка во время изменения данных опроса');
+        },
     });
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit((data) => console.log(data))} className='flex flex-col gap-4 mb-[32px]'>
+            <form
+                onSubmit={form.handleSubmit((data) => {
+                    const changed = Object.keys(form.formState.dirtyFields).reduce((acc, key) => {
+                        acc[key] = data[key];
+                        return acc;
+                    }, {} as Partial<z.infer<typeof formSchema>>);
+                    mutate(changed);
+                })}
+                className='flex flex-col gap-4 mb-[32px]'
+            >
                 <FormField
                     control={form.control}
                     name='name'
@@ -118,87 +218,127 @@ function EditorForm() {
                         </FormItem>
                     )}
                 />
-                <Button disabled>Сохранить</Button>
+                <Button disabled={!form.formState.isDirty || isPending}>Сохранить</Button>
             </form>
         </Form>
     );
 }
 
 function QuestionsList() {
-    const questions: Question[] = [
-        {
-            id: 1,
-            content: 'Вопрос 1',
-            type: 0,
-            answers_amount: 0,
-            survey_id: 1,
-            t_created_at: new Date(),
-            t_updated_at: new Date(),
-            t_deleted: false,
-            image: null,
-            image_url: null,
+    const { surveyId } = useParams();
+    const { data, isPending } = useQuery({
+        queryKey: ['survey', 'questions', surveyId],
+        queryFn: () => api.get<Question[]>(`/question/${surveyId}`),
+    });
+
+    const queryClient = useQueryClient();
+    const { mutate } = useMutation({
+        mutationFn: (question_id: number) => api.delete(`/question/${question_id}`),
+        onSuccess: () => {
+            toast('Вопрос успешно удален');
+            queryClient.invalidateQueries({
+                queryKey: ['survey', 'questions', surveyId],
+                exact: true,
+            });
         },
-    ];
+        onError: () => {
+            toast.error('Ошибка при удалении вопроса');
+        },
+    });
+
     return (
         <div className='flex flex-col gap-4 py-4 border bg-[#F4F4F5] bg-opacity-50 rounded-[8px]'>
             <div className='flex justify-end gap-2 px-4'>
-                <Button variant='outline'>Поделиться</Button>
+                <Button
+                    variant='outline'
+                    onClick={() => {
+                        navigator.clipboard.writeText(`http://localhost:3000/survey/${surveyId}`);
+                        toast('Ссылка скопирована в буфер обмена');
+                    }}
+                >
+                    Поделиться
+                </Button>
             </div>
 
             <div className='flex flex-col'>
-                {questions.map((q) => (
-                    <div className='flex justify-between items-center px-4 h-10 border-b' key={q.id}>
-                        <div className='flex items-center gap-[32px]'>
-                            <p className='max-w-[300px] text-ellipsis whitespace-nowrap overflow-hidden'>
-                                {q.id}. {q.content}
-                            </p>
-                            <span className='text-xs text-muted-foreground'>
-                                {q.type === QuestionType.FREE_INPUT && 'Свободный ввод'}
-                                {q.type === QuestionType.ONE_QUESTION && 'Один вариант'}
-                                {q.type === QuestionType.MULTI_QUESTION && 'Несколько вариантов'}
-                                {q.type === QuestionType.SCALE && 'Шкала (от 1 до 5)'}
-                            </span>
-                        </div>
-                        <div>
-                            <UpdateQuestionDialog question_id={q.id} content='' type='0' />
-                            <Button size='icon' variant='ghost'>
-                                <TrashIcon strokeWidth={1} />
-                            </Button>
-                        </div>
-                    </div>
-                ))}
+                {isPending && <div className='px-4'>Загрузка...</div>}
+                {data &&
+                    !isPending &&
+                    data.data
+                        .sort((a, b) => new Date(a.t_created_at).getTime() - new Date(b.t_created_at).getTime())
+                        .map((q, ind) => (
+                            <div className='flex justify-between items-center px-4 h-10 border-b' key={q.id}>
+                                <div className='flex items-center gap-[32px]'>
+                                    <p className='max-w-[300px] text-ellipsis whitespace-nowrap overflow-hidden'>
+                                        {ind + 1}. {q.content || 'Текст вопроса'}
+                                    </p>
+                                    <span className='text-xs text-muted-foreground'>
+                                        {+q.type === QuestionType.FREE_INPUT && 'Свободный ввод'}
+                                        {+q.type === QuestionType.ONE_QUESTION && 'Один вариант'}
+                                        {+q.type === QuestionType.MULTI_QUESTION && 'Несколько вариантов'}
+                                        {+q.type === QuestionType.SCALE && 'Шкала (от 1 до 5)'}
+                                    </span>
+                                </div>
+                                <div>
+                                    <UpdateQuestionDialog question_id={q.id} content={q.content} type={q.type} />
+                                    <Button size='icon' variant='ghost' onClick={() => mutate(q.id)}>
+                                        <TrashIcon strokeWidth={1} />
+                                    </Button>
+                                </div>
+                            </div>
+                        ))}
             </div>
         </div>
     );
 }
 
-const date = new Date();
-
 function SurveyTags() {
-    const [tags, setTags] = useState<Tag[]>([
-        {
-            id: 1,
-            name: 'React',
-            t_created_at: date,
-            t_updated_at: date,
-            t_deleted: false,
-        },
-    ]);
+    const { surveyId } = useParams();
+    const queryClient = useQueryClient();
+    const { data, isPending } = useQuery({
+        queryKey: ['survey', 'tags', surveyId],
+        queryFn: () => api.get<Tag[]>(`/tag/survey/${surveyId}`),
+    });
 
-    const data = {
-        tags: [
-            {
-                id: 1,
-                name: 'React',
-                t_created_at: date,
-                t_updated_at: date,
-                t_deleted: false,
-            },
-        ],
-    };
+    const { mutate: addTags } = useMutation({
+        mutationFn: (data: { tags: number[] }) => api.post(`/tag/survey/${surveyId}`, data),
+        onSuccess: () => {
+            toast('Изменения успешно внесены');
+            queryClient.invalidateQueries({
+                queryKey: ['survey', 'tags', surveyId],
+                exact: true,
+            });
+        },
+        onError: () => {
+            toast.error('Произошла ошибка при внесении изменений');
+        },
+    });
+
+    const { mutate: deleteTags } = useMutation({
+        mutationFn: (data: { tags: number[] }) =>
+            api.delete(`/tag/survey/${surveyId}`, {
+                data,
+            }),
+        onSuccess: () => {
+            toast('Изменения успешно внесены');
+            queryClient.invalidateQueries({
+                queryKey: ['survey', 'tags', surveyId],
+                exact: true,
+            });
+        },
+        onError: () => {
+            toast.error('Произошла ошибка при внесении изменений');
+        },
+    });
+
+    const [tags, setTags] = useState<Tag[]>([]);
+
+    useEffect(() => {
+        if (data) setTags(data.data);
+    }, [data]);
     return (
         <PageRightColumn className='flex justify-end'>
-            <Card className='w-[300px] h-fit mt-[100px]'>
+            <Card className='w-[300px] h-fit'>
                 <CardHeader className='flex justify-between flex-row'>
                     <div className='flex flex-col flex-1 gap-2'>
                         <CardTitle className='w-fit font-normal'>Теги</CardTitle>
@@ -220,27 +360,37 @@ function SurveyTags() {
                             </DialogHeader>
                             <TagsCombobox currentTags={tags} setCurrentTags={setTags} />
                             <div className='flex flex-wrap items-center gap-x-2'>
-                                {tags.map((tag) => (
-                                    <div className={cn(badgeVariants(), 'w-fit gap-2 items-center')} key={tag.id}>
-                                        {tag.name}
-                                        <Button
-                                            size={null}
-                                            variant={null}
-                                            onClick={() => setTags((prev) => prev.filter((t) => t.id !== tag.id))}
-                                            className='rounded-full'
-                                        >
-                                            <XIcon />
-                                        </Button>
-                                    </div>
-                                ))}
+                                {isPending &&
+                                    new Array(5)
+                                        .fill(0)
+                                        .map((_, ind) => <Skeleton key={ind} className={badgeVariants()} />)}
+                                {!isPending &&
+                                    tags.map((tag) => (
+                                        <div className={cn(badgeVariants(), 'w-fit gap-2 items-center')} key={tag.id}>
+                                            {tag.name}
+                                            <Button
+                                                size={null}
+                                                variant={null}
+                                                onClick={() => setTags((prev) => prev.filter((t) => t.id !== tag.id))}
+                                                className='rounded-full'
+                                            >
+                                                <XIcon />
+                                            </Button>
+                                        </div>
+                                    ))}
                             </div>
-                            {JSON.stringify(tags) !== JSON.stringify(data.tags) && (
+                            {data && JSON.stringify(tags) !== JSON.stringify(data.data) && (
                                 <Button
                                     onClick={() => {
-                                        const deleted = data.tags.filter((tag) => !tags.find((t) => t.id === tag.id));
-                                        const added = tags.filter((tag) => !data.tags.find((t) => t.id === tag.id));
-                                        console.log('@tags modal deleted:', deleted);
-                                        console.log('@tags modal added:', added);
+                                        const deleted = data.data
+                                            .filter((tag) => !tags.find((t) => t.id === tag.id))
+                                            .map((el) => el.id);
+                                        const added = tags
+                                            .filter((tag) => !data.data.find((t) => t.id === tag.id))
+                                            .map((el) => el.id);
+
+                                        if (deleted.length > 0) deleteTags({ tags: deleted });
+                                        if (added.length > 0) addTags({ tags: added });
                                     }}
                                 >
                                     Сохранить
@@ -249,8 +399,8 @@ function SurveyTags() {
                         </DialogContent>
                     </Dialog>
                 </CardHeader>
-                <CardContent className='mt-2'>
-                    {data.tags.map((tag) => (
+                <CardContent className='mt-2 flex flex-wrap gap-2'>
+                    {data?.data.map((tag) => (
                         <Badge key={tag.id}>{tag.name}</Badge>
                     ))}
                 </CardContent>
@@ -268,43 +418,10 @@ export function TagsCombobox({
 }) {
     const [open, setOpen] = useState(false);
 
-    const tags: Tag[] = [
-        {
-            id: 1,
-            name: 'React',
-            t_created_at: date,
-            t_updated_at: date,
-            t_deleted: false,
-        },
-        {
-            id: 2,
-            name: 'Vue',
-            t_created_at: date,
-            t_updated_at: date,
-            t_deleted: false,
-        },
-        {
-            id: 3,
-            name: 'Angular',
-            t_created_at: date,
-            t_updated_at: date,
-            t_deleted: false,
-        },
-        {
-            id: 4,
-            name: 'Svelte',
-            t_created_at: date,
-            t_updated_at: date,
-            t_deleted: false,
-        },
-        {
-            id: 5,
-            name: 'Next.js',
-            t_created_at: date,
-            t_updated_at: date,
-            t_deleted: false,
-        },
-    ];
+    const { data } = useQuery({
+        queryKey: ['tags'],
+        queryFn: () => api.get<Tag[]>('/tag/'),
+    });
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -320,7 +437,7 @@ export function TagsCombobox({
                     <CommandList>
                         <CommandEmpty>Теги не найдены.</CommandEmpty>
                         <CommandGroup>
-                            {tags.map((tag) => (
+                            {data?.data.map((tag) => (
                                 <CommandItem
                                     key={tag.id}
                                     value={tag.id.toString()}
@@ -328,7 +445,7 @@ export function TagsCombobox({
                                         setCurrentTags((prev) =>
                                             prev.some((v) => v.id === Number(currentValue))
                                                 ? prev
-                                                : [tags.find((v) => v.id === Number(currentValue))!, ...prev]
+                                                : [data.data.find((v) => v.id === Number(currentValue))!, ...prev]
                                         );
                                     }}
                                 >
@@ -369,24 +486,38 @@ const UpdateQuestionSchema = z.object({
 
 function UpdateQuestionDialog({ question_id, content, type }: { question_id: number; content: string; type: string }) {
     const [questionType, setQuestionType] = useState(type);
-    const answer_variant: AnswerVariant[] = [
-        {
-            id: 1,
-            content: 'Вариант 1',
-            question_id: question_id,
-            t_created_at: date,
-            t_updated_at: date,
-            t_deleted: false,
+    const { data } = useQuery({
+        queryKey: ['question', 'answer_variant', question_id],
+        queryFn: () => api.get<AnswerVariant[]>(`/answer-variant/${question_id}`),
+    });
+
+    const [input, setInput] = useState<string>('');
+    const queryClient = useQueryClient();
+
+    const { mutate: add } = useMutation({
+        mutationFn: (content: string) => api.post('/answer-variant', { content, question_id }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['question', 'answer_variant', question_id],
+            });
+            setInput('');
         },
-        {
-            id: 2,
-            content: 'Вариант 2',
-            question_id: question_id,
-            t_created_at: date,
-            t_updated_at: date,
-            t_deleted: false,
+        onError: () => {
+            toast.error('Произошла ошибка при создании варианта ответа');
         },
-    ];
+    });
+
+    const { mutate: deleteVariant } = useMutation({
+        mutationFn: (id: number) => api.delete(`/answer-variant/${id}`),
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['question', 'answer_variant', question_id],
+            });
+        },
+        onError: () => {
+            toast.error('Произошла ошибка при удалении варианта ответа');
+        },
+    });
 
     return (
         <Dialog>
@@ -410,16 +541,22 @@ function UpdateQuestionDialog({ question_id, content, type }: { question_id: num
                         <div className='flex flex-col gap-2'>
                             <Label htmlFor='variant-input'>Текст варианта ответа</Label>
                             <div className='w-full flex gap-2 items-center'>
-                                <Input type='text' id='variant-input' className='flex-1' />
-                                <Button size='icon' variant='default'>
+                                <Input
+                                    type='text'
+                                    id='variant-input'
+                                    className='flex-1'
+                                    onChange={(e) => setInput(e.target.value)}
+                                    value={input}
+                                />
+                                <Button size='icon' variant='default' onClick={() => input !== '' && add(input)}>
                                     <PlusIcon strokeWidth={2} />
                                 </Button>
                             </div>
                         </div>
-                        {answer_variant.map((variant) => (
+                        {data?.data.map((variant) => (
                             <div key={variant.id} className='flex items-center justify-between border-b'>
                                 <p>{variant.content}</p>
-                                <Button size='icon' variant='ghost'>
+                                <Button size='icon' variant='ghost' onClick={() => deleteVariant(variant.id)}>
                                     <TrashIcon strokeWidth={2} />
                                 </Button>
                             </div>
@@ -441,8 +578,9 @@ function UpdateQuestionForm({
     type: string;
     setQuestionType: React.Dispatch<React.SetStateAction<string>>;
 }) {
+    const { surveyId } = useParams();
     const form = useForm<z.infer<typeof UpdateQuestionSchema>>({
-        resolver: zodResolver(formSchema),
+        resolver: zodResolver(UpdateQuestionSchema),
         mode: 'onChange',
         defaultValues: { content, type },
     });
@@ -450,20 +588,54 @@ function UpdateQuestionForm({
     const questionType = form.watch('type');
     useEffect(() => {
         setQuestionType(questionType);
-    }, [questionType]);
+    }, [questionType, setQuestionType]);
+
+    const queryClient = useQueryClient();
+
+    const { mutate } = useMutation({
+        mutationFn: (data: FormData) =>
+            api.patch(`/question/${question_id}`, data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }),
+        onSuccess: (_, v) => {
+            const obj: Partial<z.infer<typeof UpdateQuestionSchema>> = {};
+            v.forEach((value, key) => {
+                obj[key] = value;
+            });
+
+            toast('Вопрос успешно изменен');
+            form.reset({
+                ...form.getValues(),
+                ...obj,
+            });
+            queryClient.invalidateQueries({
+                queryKey: ['survey', 'questions', surveyId],
+            });
+        },
+        onError: () => {
+            toast.error('Произошла ошибка при изменении вопроса');
+        },
+    });
 
     return (
         <Form {...form}>
             <form
                 onSubmit={form.handleSubmit((data) => {
                     const changedData = Object.keys(form.formState.dirtyFields).reduce<
-                        Partial<z.infer<typeof formSchema>>
+                        Partial<z.infer<typeof UpdateQuestionSchema>>
                     >((acc, key) => {
                         // @ts-expect-error any
                         acc[key] = data[key];
                         return acc;
                     }, {});
-                    console.log(changedData);
+                    const formdata = new FormData();
+                    if (changedData.content !== undefined) formdata.append('content', changedData.content);
+                    if (changedData.image !== undefined) formdata.append('image', changedData.image);
+                    if (changedData.type !== undefined) formdata.append('type', changedData.type);
+
+                    mutate(formdata);
                 })}
                 className='grid gap-4'
             >
@@ -521,7 +693,7 @@ function UpdateQuestionForm({
                         </FormItem>
                     )}
                 />
-                {form.formState.isDirty && <Button>Сохранить</Button>}
+                {form.formState.isDirty && <Button type='submit'>Сохранить</Button>}
             </form>
         </Form>
     );
