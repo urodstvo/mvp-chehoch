@@ -10,13 +10,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { usePageTitle } from '@/hooks/use-page-title';
 
-const formSchema = z.object({
-    login: z.string(),
-    password: z.string(),
-    email: z.string(),
-    repeatPassword: z.string(),
-});
-
 export const RegisterPage = () => {
     usePageTitle('Регистрация');
 
@@ -41,6 +34,30 @@ export const RegisterPage = () => {
     );
 };
 
+const formSchema = z
+    .object({
+        login: z.string({
+            required_error: 'Логин обязателен',
+        }),
+        email: z
+            .string({
+                required_error: 'Электронная почта обязательна',
+            })
+            .email(),
+        password: z
+            .string({
+                required_error: 'Пароль обязателен',
+            })
+            .min(6, 'Минимум 6 символов'),
+        repeatPassword: z.string({
+            required_error: 'Повторите пароль',
+        }),
+    })
+    .refine((data) => data.password === data.repeatPassword, {
+        message: 'Пароли не совпадают',
+        path: ['repeatPassword'],
+    });
+
 function RegisterForm() {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -64,11 +81,11 @@ function RegisterForm() {
                         <FormField
                             control={form.control}
                             name='email'
-                            render={() => (
+                            render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Электронная почта</FormLabel>
                                     <FormControl>
-                                        <Input id='email' type='email' required />
+                                        <Input id='email' type='email' {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -77,11 +94,11 @@ function RegisterForm() {
                         <FormField
                             control={form.control}
                             name='login'
-                            render={() => (
+                            render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Логин</FormLabel>
                                     <FormControl>
-                                        <Input id='login' type='text' required />
+                                        <Input id='login' type='text' {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -90,13 +107,13 @@ function RegisterForm() {
                         <FormField
                             control={form.control}
                             name='password'
-                            render={() => (
+                            render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Пароль</FormLabel>
                                     <FormControl>
-                                        <Input id='password' type='password' required />
+                                        <Input id='password' type='password' {...field} />
                                     </FormControl>
-                                    <FormDescription>Минимум 8 символов</FormDescription>
+                                    <FormDescription>Минимум 6 символов</FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -104,17 +121,17 @@ function RegisterForm() {
                         <FormField
                             control={form.control}
                             name='repeatPassword'
-                            render={() => (
+                            render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Повторите пароль</FormLabel>
                                     <FormControl>
-                                        <Input id='repeatPassword' type='password' required />
+                                        <Input id='repeatPassword' type='password' {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
-                        <Button type='submit' className='w-full'>
+                        <Button type='submit' className='w-full' disabled={!form.formState.isValid}>
                             Создать аккаунт
                         </Button>
                     </form>

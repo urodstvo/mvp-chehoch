@@ -10,11 +10,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { usePageTitle } from '@/hooks/use-page-title';
 
-const formSchema = z.object({
-    login: z.string(),
-    password: z.string(),
-});
-
 export const LoginPage = () => {
     usePageTitle('Регистрация');
 
@@ -39,6 +34,11 @@ export const LoginPage = () => {
     );
 };
 
+const formSchema = z.object({
+    login: z.string().optional(),
+    password: z.string().optional(),
+});
+
 function LoginForm() {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -62,11 +62,11 @@ function LoginForm() {
                         <FormField
                             control={form.control}
                             name='login'
-                            render={() => (
+                            render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Логин</FormLabel>
                                     <FormControl>
-                                        <Input id='login' type='text' required />
+                                        <Input id='login' type='text' {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -75,17 +75,17 @@ function LoginForm() {
                         <FormField
                             control={form.control}
                             name='password'
-                            render={() => (
+                            render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Пароль</FormLabel>
                                     <FormControl>
-                                        <Input id='password' type='password' required />
+                                        <Input id='password' type='password' {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
-                        <Button type='submit' className='w-full'>
+                        <Button type='submit' className='w-full' disabled={!form.formState.isValid}>
                             Войти
                         </Button>
                     </form>
