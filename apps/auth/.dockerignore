@@ -1,0 +1,6 @@
+node_modules
+frontend
+apps/api
+apps/survey
+venv
+__generated__

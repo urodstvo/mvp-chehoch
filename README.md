@@ -1,5 +1,21 @@
+<!-- prettier-ignore-start -->
 # mvp-chehoch
 
-group project at the university
+Перед началом работы запустите `initialisation.bat`
 
-![SVG Image](./docs/architecture.svg)
+```cmd
+.\initialisation.bat
+```
+
+или, если есть NodeJS
+
+```cmd
+npm run init:project
+```
+
+
+## group project at the university
+
+![Architecture](./docs/ЧЕХОЧ.png)
+
+<!-- prettier-ignore-end -->

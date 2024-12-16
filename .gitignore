@@ -165,3 +165,11 @@ __generated__
 .idea
 
 .postgres
+.redis
+.minio
+.minio-config
+
+*_pb2*.py
+
+
+node_modules

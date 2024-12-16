@@ -1,7 +1,255 @@
 syntax = "proto3";
 
 option go_package = "/proto";
+package proto.auth;
+
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 
 service Auth {
+    rpc Login (LoginRequest) returns (LoginResponse) {}
+    rpc Register (RegisterRequest) returns (RegisterResponse) {}
+    rpc Logout (google.protobuf.Empty) returns (google.protobuf.Empty) {}
 
+    // with session_id in metadata
+    rpc GetUserFromSession (google.protobuf.Empty) returns (GetUserFromSessionResponse) {}
+    rpc CheckSession (google.protobuf.Empty) returns (CheckSessionResponse) {}
+    rpc RefreshSession (google.protobuf.Empty) returns (google.protobuf.Empty) {}
+
+    rpc CheckAccess (CheckAccessRequest) returns (CheckAccessResponse) {}
+
+    rpc GetUser(GetUserRequest) returns (GetUserResponse) {}
+    rpc GetUsers(GetUsersRequest) returns (GetUsersResponse) {}
+    rpc UpdateUser(UpdateUserRequest) returns (google.protobuf.Empty) {}
+    rpc DeleteUser(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+    rpc GetUserTags(google.protobuf.Empty) returns (GetUserTagsResponse) {}
+
+    rpc AddTagsToUser(AddTagsToUserRequest) returns (google.protobuf.Empty) {}
+    rpc DeleteTagsFromUser(DeleteTagsFromUserRequest) returns (google.protobuf.Empty) {}
+
+    rpc CreateOrganisation(CreateOrganisationRequest) returns (google.protobuf.Empty) {}
+    rpc GetOrganisation(GetOrganisationRequest) returns (GetOrganisationResponse) {}
+    rpc GetOrganisations(GetOrganisationsRequest) returns (GetOrganisationsResponse) {}
+    rpc UpdateOrganisation(UpdateOrganisationRequest) returns (google.protobuf.Empty) {}
+    rpc DeleteOrganisation(DeleteOrganisationRequest) returns (google.protobuf.Empty) {}
+    rpc GetUserOrganisations(google.protobuf.Empty) returns (GetUserOrganisationsResponse) {}
+
+}
+
+message User {
+    int64 id = 1;
+    string login = 2;
+    string email = 3;
+    google.protobuf.Timestamp t_created_at = 4; 
+    google.protobuf.Timestamp t_updated_at = 5; 
+    bool t_deleted = 6;
+}
+
+enum MaritalStatus {
+    SINGLE = 0;
+    MARRIED = 1;
+}
+
+enum EducationLevel {
+    SCHOOL = 0;
+    COLLEGE = 1;
+    STUDENT = 2;
+}
+
+message Profile {
+    int64 id = 1;
+    google.protobuf.StringValue proffession = 2;
+    google.protobuf.Timestamp birth_date = 3;
+    oneof marital_status {
+        MaritalStatus status = 4; // Enum value
+        google.protobuf.Empty no_status = 5; // Represents null
+    }
+    oneof education_level {
+        EducationLevel level = 6; // Enum value
+        google.protobuf.Empty no_level = 7; // Represents null
+    }
+}
+
+message UserWithProfile {
+    int64 id = 1;
+    string login = 2;
+    string email = 3;
+    google.protobuf.StringValue proffession = 4;
+    google.protobuf.Timestamp birth_date = 5;
+    // oneof marital_status {
+    //     MaritalStatus status = 6; // Enum value
+    //     google.protobuf.Empty no_status = 7; // Represents null
+    // }
+    // oneof education_level {
+    //     EducationLevel level = 8; // Enum value
+    //     google.protobuf.Empty no_level = 9; // Represents null
+    // }
+    google.protobuf.Timestamp t_created_at = 10; 
+    google.protobuf.Timestamp t_updated_at = 11; 
+    bool t_deleted = 12;
+}
+
+message Tag {
+    int64 id = 1;
+    string name = 2;
+    google.protobuf.Timestamp t_created_at = 3; 
+    google.protobuf.Timestamp t_updated_at = 4; 
+    bool t_deleted = 5;
+}
+
+message Tags {
+    repeated Tag tags = 1;
+}
+
+message Organisation {
+    int64 id = 1;
+    string name = 2;
+    int64 supervisor = 3;
+    google.protobuf.StringValue email = 4;
+    google.protobuf.StringValue phone = 5;
+    google.protobuf.StringValue adress = 6;
+    google.protobuf.StringValue web_site = 7;
+    google.protobuf.StringValue inn = 8;
+    google.protobuf.Timestamp t_created_at = 9; 
+    google.protobuf.Timestamp t_updated_at = 10; 
+    bool t_deleted = 11;
+    google.protobuf.Int64Value logo = 12;
+}
+
+
+message LoginRequest {
+    string login = 1;
+    string password = 2;
+}
+
+message LoginResponse {
+    string session_id = 1;
+}
+
+message RegisterRequest {
+    string login = 1;
+    string password = 2;
+    string email = 3;
+}
+
+message RegisterResponse {
+    string session_id = 1;
+}
+
+message LogoutRequest {
+    string session_id = 1;
+}
+
+message CheckSessionRequest {
+    string session_id = 1;
+}
+
+message CheckSessionResponse {
+    bool valid = 1;
+}
+
+message RefreshSessionRequest {
+    string session_id = 1;
+}
+
+message GetUserRequest {
+    int64 user_id = 1;
+}
+
+message GetUserResponse {
+    UserWithProfile user = 1;
+}
+
+message GetUsersRequest {
+    repeated int64 user_ids = 1;
+}
+
+message GetUsersResponse {
+    repeated UserWithProfile users = 1;
+}
+
+message CheckAccessRequest {
+    string endpoint = 1;
+}
+
+message CheckAccessResponse {
+    bool allowed = 1;
+}
+
+message UpdateUserRequest {
+    optional string login = 1;
+    optional string email = 2;
+    optional string proffession = 3;
+    optional google.protobuf.Timestamp birth_date = 4;
+    optional MaritalStatus marital_status = 5;
+    optional EducationLevel education_level = 6;
+}
+
+message GetOrganisationRequest {
+    int64 organisation_id = 1;
+}
+
+message GetOrganisationResponse {
+    Organisation organisation = 1;
+}
+
+message GetOrganisationsRequest {
+    repeated int64 organisation_ids = 1;
+}
+
+message GetOrganisationsResponse {
+    repeated Organisation organisations = 1;
+}
+
+message GetAllOrganisationsResponse {
+    repeated Organisation organisations = 1;
+}
+
+message CreateOrganisationRequest {
+    int64 supervisor = 7;
+    string name = 1;
+    optional string email = 2;
+    optional string phone = 3;
+    optional string address = 4;
+    optional string inn = 5;
+    optional string web_site = 6;    
+    optional int64 logo = 8;
+}
+    
+
+message UpdateOrganisationRequest {
+    int64 organisation_id = 7;
+    optional string name = 1;
+    optional string email = 2;
+    optional string phone = 3;
+    optional string address = 4;
+    optional string inn = 5;
+    optional string web_site = 6;
+    optional int64 logo = 8;
+}
+
+message DeleteOrganisationRequest {
+    int64 organisation_id = 1;
+}
+
+message GetUserFromSessionResponse {
+    UserWithProfile user = 1;
+}
+
+message AddTagsToUserRequest {
+    repeated int64 tags = 1;
+}
+
+message DeleteTagsFromUserRequest {
+    repeated int64 tags = 1;
+}
+
+message GetUserOrganisationsResponse {
+    repeated Organisation organisations = 1;
+}
+
+message GetUserTagsResponse {
+    repeated Tag tags = 1;
 }

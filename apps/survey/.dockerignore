@@ -1,3 +1,6 @@
 venv
 __generated__
 proto
+.idea
+__pycache__
+node_modules

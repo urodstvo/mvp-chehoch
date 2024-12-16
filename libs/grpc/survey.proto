@@ -1,6 +1,303 @@
 syntax = "proto3";
 
 
-service Survey {
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 
+
+service SurveyService {
+    rpc CreateSurvey (CreateSurveyRequest) returns (google.protobuf.Empty) {}
+    rpc UpdateSurvey (UpdateSurveyRequest) returns (google.protobuf.Empty) {}
+    rpc DeleteSurvey (DeleteSurveyRequest) returns (google.protobuf.Empty) {}
+    rpc GetSurveys (GetSurveysRequest) returns (GetSurveysResponse) {}
+    rpc GetSurvey (GetSurveyRequest) returns (GetSurveyResponse) {}
+    rpc GetOrganisationSurveys (GetOrganisationSurveysRequest) returns (GetOrganisationSurveysResponse) {}
+    rpc GetCompletedSurveys (GetCompletedSurveysRequest) returns (GetCompletedSurveysResponse) {}    
+    rpc CompleteSurvey (CompleteSurveyRequest) returns (google.protobuf.Empty) {}
+    rpc GetSurveyTags (GetSurveyTagsRequest) returns (GetSurveyTagsResponse) {}
+
+    rpc AddTagsToSurvey (AddTagsToSurveyRequest) returns (google.protobuf.Empty) {}
+    rpc DeleteTagsFromSurvey (DeleteTagsFromSurveyRequest) returns (google.protobuf.Empty) {}
+
+    rpc CreateQuestion (CreateQuestionRequest) returns (google.protobuf.Empty) {}
+    rpc UpdateQuestion (UpdateQuestionRequest) returns (google.protobuf.Empty) {}
+    rpc DeleteQuestion (DeleteQuestionRequest) returns (google.protobuf.Empty) {}
+    rpc GetSurveyQuestions (GetSurveyQuestionsRequest) returns (GetSurveyQuestionsResponse) {}
+    rpc CompleteQuestion (CompleteQuestionRequest) returns (google.protobuf.Empty) {}
+    rpc DeleteQuestionImage (DeleteQuestionImageRequest) returns (google.protobuf.Empty) {}
+
+    // rpc UpdateAnswer (UpdateAnswerRequest) returns (google.protobuf.Empty) {}
+    rpc GetQuestionAnswers (GetQuestionAnswersRequest) returns (GetQuestionAnswersResponse) {}
+
+    rpc UpdateAnswerVariant (UpdateAnswerVariantRequest) returns (google.protobuf.Empty) {}
+    rpc GetQuestionAnswerVariants (GetQuestionAnswerVariantsRequest) returns (GetQuestionAnswerVariantsResponse) {}
+    rpc DeleteAnswerVariant (DeleteAnswerVariantRequest) returns (google.protobuf.Empty) {}
+
+    rpc GetSurveyReport (GetSurveyReportRequest) returns (GetSurveyReportResponse) {}
+
+    rpc CreateFile (CreateFileRequest) returns (CreateFileResponse) {}
+    rpc GetFile (GetFileRequest) returns (GetFileResponse) {}
+    rpc DeleteFile (DeleteFileRequest) returns (google.protobuf.Empty) {}
+
+    rpc GetSurveysWithTagsIds (google.protobuf.Empty) returns (GetSurveysWithTagsIdsResponse) {}
+    rpc GetAllTags (google.protobuf.Empty) returns (GetAllTagsResponse) {}
+}
+
+message Tag {
+    int32 id = 1;
+    string name = 2;
+    google.protobuf.Timestamp t_created_at = 3; 
+    google.protobuf.Timestamp t_updated_at = 4; 
+    bool t_deleted = 5;
+}
+
+message File {
+    int32 id = 1;
+    string filename	= 2;
+    string mime_type = 3;
+    int64 mem_size = 4;
+    int32 user_id = 5;	
+    google.protobuf.Timestamp t_created_at = 6; 
+    google.protobuf.Timestamp t_updated_at = 7; 
+    bool t_deleted = 8;
+}
+
+message Survey {
+    int32 id = 1;
+    google.protobuf.StringValue name = 2;
+    google.protobuf.StringValue description = 3;
+    int32 questions_amount = 4;
+    int32 answers_amount = 5;
+    int32 created_by = 6;
+    int32 organisation_id = 7;
+    google.protobuf.Timestamp t_created_at = 8;
+    google.protobuf.Timestamp t_updated_at = 9;
+    bool t_deleted = 10;
+}
+
+message Question {
+    int32 id = 1;
+    int32 survey_id = 2;
+    google.protobuf.StringValue type = 3;
+    google.protobuf.StringValue content = 4 ;
+    int32 answers_amount = 5;
+    google.protobuf.Timestamp t_created_at = 6;
+    google.protobuf.Timestamp t_updated_at = 7;
+    bool t_deleted = 8;
+    google.protobuf.Int32Value image = 9;
+}
+
+message Answer {
+    int32 id = 1;
+    int32 question_id = 2;
+    int32 user_id = 3;
+    int32 answer_variant_id = 8;
+    string content = 9;
+    google.protobuf.Int32Value priority = 4;
+    google.protobuf.Timestamp t_created_at = 5;
+    google.protobuf.Timestamp t_updated_at = 6;
+    bool t_deleted = 7;
+}
+
+message AnswerVariant {
+    int32 id = 1;
+    int32 question_id = 2;
+    string content = 3;
+    google.protobuf.Timestamp t_created_at = 4;
+    google.protobuf.Timestamp t_updated_at = 5;
+    bool t_deleted = 6;
+}
+
+message CreateSurveyRequest {
+    int32 organisation_id = 1;
+    int32 created_by = 2;
+}
+
+message UpdateSurveyRequest {
+    int32 survey_id = 1;
+    optional string name = 2;
+    optional string description = 3;
+}
+
+message DeleteSurveyRequest {
+    int32 survey_id = 1;
+}
+
+message GetSurveysRequest {
+    repeated int32 surveys_ids = 1;
+}
+
+message GetSurveysResponse {
+    repeated Survey survey = 1;
+}
+
+message GetSurveyRequest {
+    int32 survey_id = 1;
+}
+
+message GetSurveyResponse {
+    Survey survey = 1;
+}
+
+message GetOrganisationSurveysRequest {
+    int32 organisation_id = 1;
+}
+
+message GetOrganisationSurveysResponse {
+    repeated Survey survey = 1;
+}
+
+message GetCompletedSurveysResponse {
+    repeated Survey survey = 1;
+}
+
+message AddTagsToSurveyRequest {
+    int32 survey_id = 1;
+    repeated int32 tags = 2;
+}
+
+message DeleteTagsFromSurveyRequest {
+    int32 survey_id = 1;
+    repeated int32 tags = 2;
+}
+
+message CreateQuestionRequest {
+    int32 survey_id = 1;
+    int32 type = 2;
+}
+
+message UpdateQuestionRequest {
+    int32 question_id = 1;
+    optional string content = 2;
+    optional int32 type = 3;
+    optional int32 file_id = 4;
+}
+
+message DeleteQuestionRequest {
+    int32 question_id = 1;
+}
+
+message GetSurveyQuestionsRequest {
+    int32 survey_id = 1;
+}
+
+message GetSurveyQuestionsResponse {
+    repeated Question questions = 1;
+}
+
+message UpdateAnswerRequest {
+    int32 answer_id = 2;
+    optional int32 priority = 3;
+}
+
+message GetQuestionAnswersRequest {
+    int32 question_id = 1;
+    int32 user_id = 2;
+}
+
+message GetQuestionAnswersResponse {
+    repeated Answer answer = 1;
+}
+
+message GetQuestionAnswerVariantsRequest {
+    int32 question_id = 1;
+}
+
+message GetQuestionAnswerVariantsResponse {
+    repeated AnswerVariant answer_variant = 1;
+}
+
+message UpdateAnswerVariantRequest {
+    optional int32 answer_variant_id = 1;
+    optional string content = 2;
+    int32 question_id = 3;
+}
+
+message DeleteAnswerVariantRequest {
+    int32 answer_variant_id = 1;
+}
+
+message GetSurveyReportRequest {
+    int32 survey_id = 1;
+}
+
+message ReportQuestion {
+    Question question = 1;
+    repeated AnswerVariant answer_variants = 2;
+    repeated Answer answers = 3;
+}
+
+message GetSurveyReportResponse {
+    Survey survey = 1;
+    repeated ReportQuestion questions = 2;
+}
+
+message CompleteSurveyRequest {
+    int32 survey_id = 1;
+    int32 user_id = 2;
+}
+
+message ChoosenAnswer {
+    optional int32 answer_variant_id = 1;
+    optional int32 priority = 2;
+    string content = 3;
+}
+
+message CompleteQuestionRequest {
+    int32 question_id = 1;
+    repeated ChoosenAnswer answers = 2;
+    int32 user_id = 3;
+}
+
+message GetCompletedSurveysRequest {
+    int32 user_id = 1;
+}
+
+message GetSurveyTagsRequest {
+    int32 survey_id = 1;
+}
+
+message GetSurveyTagsResponse {
+    repeated Tag tags = 1;
+}
+
+message CreateFileRequest {
+    string filename	= 1;
+    string mime_type = 2;
+    int64 mem_size = 3;
+    int32 user_id = 4;	
+}
+
+message CreateFileResponse {
+    int32 file_id = 1;
+}
+
+message DeleteFileRequest {
+    int32 file_id = 1;
+}
+
+message GetFileRequest {
+    int32 file_id = 1;
+}
+
+message GetFileResponse {
+    File file = 1;
+}
+
+message DeleteQuestionImageRequest {
+    int32 question_id = 1;
+}
+
+message SurveyWithTagId {
+    int32 survey_id = 1;
+    int32 tag_id = 2;
+}
+
+message GetSurveysWithTagsIdsResponse {
+    repeated SurveyWithTagId survey_with_tag_ids = 1;
+}
+
+message GetAllTagsResponse {
+    repeated Tag tags = 1;
 }

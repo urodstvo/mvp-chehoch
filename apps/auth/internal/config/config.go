@@ -10,8 +10,9 @@ import (
 )
 
 type Config struct {
-	DatabaseUrl string `required:"false"                                       envconfig:"DATABASE_URL"`
-	AppEnv      string `required:"true"  default:"development"                 envconfig:"APP_ENV"`
+	DATABASE_URL string `required:"true"                       envconfig:"DATABASE_URL"`
+	REDIS_URL    string `required:"true"                       envconfig:"REDIS_URL"`
+	APP_ENV      string `required:"true" default:"development" envconfig:"APP_ENV"`
 }
 
 func NewWithEnvPath(envPath string) (*Config, error) {
@@ -31,10 +32,12 @@ func New() (*Config, error) {
 		return nil, err
 	}
 
-	if strings.HasPrefix(wd, "/workspace") {
-		wd = "/workspace"
+	if strings.HasPrefix(wd, "/app") {
+		wd = "/app"
 	} else {
-		wd = filepath.Join(wd, "..", "..", "..", "..")
+		for !strings.HasSuffix(wd, "mvp-chehoch") {
+			wd = filepath.Join(wd, "..")
+		}
 	}
 
 	envPath := filepath.Join(wd, ".env")

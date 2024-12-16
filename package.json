@@ -1,11 +1,15 @@
 {
   "name": "chehoch",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "group project",
   "main": " ",
   "scripts": {
-    "dev": "npm run dev:survey",
-    "dev:survey": "python ./apps/survey/server.py",
+    "init:project": "initialisation.bat",
+    "dev": "npm-run-all --parallel dev:survey dev:auth dev:api",
+    "dev:survey": "cd apps\\survey && venv\\Scripts\\python.exe -m server",
+    "dev:auth": "go run apps/auth/cmd/main.go",
+    "dev:api": "cd apps\\api && venv\\Scripts\\python.exe -m server",
+    "docker:dev": "docker-compose -f docker-compose.dev.yaml up -d",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -13,5 +17,8 @@
     "url": "github.com/urodstvo/mvp-chehoch"
   },
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  }
 }
