@@ -19,12 +19,12 @@ import (
 )
 
 type Impl struct {
-	*proto.UnimplementedAuthServer
-	*auth.Auth
-	*user.User
-	*session.Session
-	*organisation.Organisation
-	*tags.Tags
+	proto.UnimplementedAuthServer
+	auth.Auth
+	user.User
+	session.Session
+	organisation.Organisation
+	tags.Tags
 }
 
 type Opts struct {
@@ -45,11 +45,11 @@ func New(opts Opts) Impl {
 	}
 
 	return Impl{
-		User:         &user.User{ImplDeps: &deps},
-		Auth:         &auth.Auth{ImplDeps: &deps},
-		Session:      &session.Session{ImplDeps: &deps},
-		Organisation: &organisation.Organisation{ImplDeps: &deps},
-		Tags:         &tags.Tags{ImplDeps: &deps},
+		User:         user.User{ImplDeps: &deps},
+		Auth:         auth.Auth{ImplDeps: &deps},
+		Session:      session.Session{ImplDeps: &deps},
+		Organisation: organisation.Organisation{ImplDeps: &deps},
+		Tags:         tags.Tags{ImplDeps: &deps},
 	}
 }
 

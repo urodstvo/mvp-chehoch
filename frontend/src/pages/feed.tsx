@@ -29,7 +29,7 @@ function Feed() {
     });
 
     return (
-        <div>
+        <div className='flex flex-col gap-4'>
             {data?.data.map((survey) => (
                 <SurveyCard key={survey.survey.id} survey={survey.survey} tags={survey.tags} />
             ))}

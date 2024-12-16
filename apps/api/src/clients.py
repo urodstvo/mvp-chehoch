@@ -10,8 +10,8 @@ import survey_pb2_grpc as survey_service
 AuthServiceClient = None
 SurveyServiceClient = None
 
-_auth_channel = grpc.insecure_channel("localhost:8002")
-_survey_channel = grpc.insecure_channel("localhost:8001")
+_auth_channel = grpc.insecure_channel("auth:8002")
+_survey_channel = grpc.insecure_channel("survey:8001")
 try:
     grpc.channel_ready_future(_auth_channel).result(timeout=10)
     grpc.channel_ready_future(_survey_channel).result(timeout=10)

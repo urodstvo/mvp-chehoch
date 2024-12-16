@@ -37,8 +37,11 @@ export const ProfileHistoryPage = () => {
                         </NavLink>
                     </TabsList>
                     <TabsContent value='history' className='mt-[32px]'>
-                        {data && data.data.map((d) => <SurveyCard key={d.survey.id} survey={d.survey} tags={d.tags} />)}
-                        {!data || (data.data.length === 0 && <p>История опросов пуста</p>)}
+                        <div className='flex flex-col gap-4'>
+                            {data &&
+                                data.data.map((d) => <SurveyCard key={d.survey.id} survey={d.survey} tags={d.tags} />)}
+                            {!data || (data.data.length === 0 && <p>История опросов пуста</p>)}
+                        </div>
                     </TabsContent>
                 </Tabs>
             </PageMiddleColumn>

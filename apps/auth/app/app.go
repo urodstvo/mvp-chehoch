@@ -47,6 +47,7 @@ var App = fx.Options(
 
 			grpcServer := grpc.NewServer(grpc.StatsHandler(otelgrpc.NewServerHandler()), grpc.UnaryInterceptor(inc.UserContextInterceptor))
 
+			// l.Info("impl", slog.Any("impl", impl))
 			proto.RegisterAuthServer(grpcServer, impl)
 
 			lc.Append(
